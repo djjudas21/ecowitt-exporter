@@ -97,7 +97,7 @@ if __name__ == "__main__":
     wind={}
     wind['windspeedmph'] = Gauge(name='windspeedmph', documentation='windspeedmph', unit='mph')
     wind['windgustmph'] = Gauge(name='windgustmph', documentation='windgustmph', unit='mph')
-    wind['maxdailygustmph'] = Gauge(name='maxdailygustmph', documentation='maxdailygustmph', unit='mph')
+    wind['maxdailygust'] = Gauge(name='maxdailygustmph', documentation='maxdailygustmph', unit='mph')
     wind['windspeedkmh'] = Gauge(name='windspeedkmh', documentation='windspeedkmh', unit='kmh')
     wind['windgustkmh'] = Gauge(name='windgustkmh', documentation='windgustkmh', unit='kmh')
     wind['maxdailygustkmh'] = Gauge(name='maxdailygustkmh', documentation='maxdailygustkmh', unit='kmh')
