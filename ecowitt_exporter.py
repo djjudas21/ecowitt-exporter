@@ -22,8 +22,8 @@ def version():
 def logEcowitt():
     fields = ''
 
-    for field in request.get_data(as_text=True).split('&'):
-        [key, value] = field.split('=')
+    for key in request.form:
+        value = request.form[key]
 
         # Ignore these fields
         if key in ['PASSKEY', 'stationtype', 'dateutc', 'wh65batt', 'wh25batt', 'batt1', 'batt2', 'freq', 'model']:
