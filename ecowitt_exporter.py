@@ -15,7 +15,7 @@ print ("  STATION_ID:      " + station_id)
 
 @app.route('/')
 def version():
-    return "Ecowither v0.1\n"
+    return "Ecowitt Exporter v0.1\n"
 
 
 @app.route('/log/ecowitt', methods=['POST'])
