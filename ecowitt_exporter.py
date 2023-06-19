@@ -1,5 +1,6 @@
-from datetime import datetime
 from flask import Flask, request
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from prometheus_client import make_wsgi_app
 import os
 
 app = Flask(__name__)
@@ -61,4 +62,8 @@ def logEcowitt():
             fields = key + "=" + value
 
 if __name__ == "__main__":
+    # Add prometheus wsgi middleware to route /metrics requests
+    app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
+        '/metrics': make_wsgi_app()
+    })
     app.run(host="0.0.0.0", port=8088, debug=True)
