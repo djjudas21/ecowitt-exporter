@@ -101,8 +101,8 @@ if __name__ == "__main__":
     temperature['temp8c'] = Gauge(name='temp8c', documentation='temp8f', unit='c')
 
     generic={}
-    generic['humidity'] = Gauge(name='humidity', documentation='humidity', unit='%')
-    generic['humidityin'] = Gauge(name='humidityin', documentation='humidityin', unit='%')
+    generic['humidity'] = Gauge(name='humidity', documentation='humidity', unit='percent')
+    generic['humidityin'] = Gauge(name='humidityin', documentation='humidityin', unit='percent')
     generic['winddir'] = Gauge(name='winddir', documentation='winddir', unit='degree')
     generic['uv'] = Gauge(name='uv', documentation='uv')
     generic['solarradiation'] = Gauge(name='solarradiation', documentation='Solar radiation', unit='klux')
