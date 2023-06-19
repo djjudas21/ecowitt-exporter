@@ -18,7 +18,7 @@ def version():
     return "Ecowitt Exporter v0.1\n"
 
 
-@app.route('/log/ecowitt', methods=['POST'])
+@app.route('/report', methods=['POST'])
 def logEcowitt():
     fields = ''
 
@@ -63,6 +63,13 @@ def logEcowitt():
             keymm = key[:-2] + 'mm'
             rain[key].set(value)
             rain[keymm].set(valuemm)
+    
+    response = app.response_class(
+            response='OK',
+            status=200,
+            mimetype='application/json'
+    )
+    return response
 
 if __name__ == "__main__":
     # Set up various Prometheus metrics with descriptions and units
