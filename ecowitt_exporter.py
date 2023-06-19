@@ -26,8 +26,12 @@ def logEcowitt():
         value = request.form[key]
 
         # Ignore these fields
-        if key in ['PASSKEY', 'stationtype', 'dateutc', 'wh65batt', 'wh25batt', 'batt1', 'batt2', 'freq', 'model']:
+        if key in ['PASSKEY', 'stationtype', 'dateutc', 'wh65batt', 'wh25batt', 'batt1', 'batt2', 'freq', 'model', 'runtime']:
             continue
+
+        # No conversions needed
+        if key in ['humidity', 'humidityin', 'winddir', 'uv', 'solarradiation']:
+            generic[key].set(value)
 
         # Convert degrees Fahrenheit to Celsius
         if key in ['tempinf', 'tempf', 'temp1f', 'temp2f', 'temp3f', 'temp4f', 'temp5f', 'temp6f', 'temp7f', 'temp8f']:
@@ -63,7 +67,7 @@ def logEcowitt():
             keymm = key[:-2] + 'mm'
             rain[key].set(value)
             rain[keymm].set(valuemm)
-    
+
     response = app.response_class(
             response='OK',
             status=200,
@@ -72,6 +76,7 @@ def logEcowitt():
     return response
 
 if __name__ == "__main__":
+
     # Set up various Prometheus metrics with descriptions and units
     temperature={}
     temperature['tempinf'] = Gauge(name='tempinf', documentation='temps', unit='f')
@@ -94,6 +99,13 @@ if __name__ == "__main__":
     temperature['temp6c'] = Gauge(name='temp6c', documentation='temp6f', unit='c')
     temperature['temp7c'] = Gauge(name='temp7c', documentation='temp7f', unit='c')
     temperature['temp8c'] = Gauge(name='temp8c', documentation='temp8f', unit='c')
+
+    generic={}
+    generic['humidity'] = Gauge(name='humidity', documentation='humidity', unit='%')
+    generic['humidityin'] = Gauge(name='humidityin', documentation='humidityin', unit='%')
+    generic['winddir'] = Gauge(name='winddir', documentation='winddir', unit='degree')
+    generic['uv'] = Gauge(name='uv', documentation='uv')
+    generic['solarradiation'] = Gauge(name='solarradiation', documentation='Solar radiation', unit='klux')
 
     pressure={}
     pressure['baromrelin'] = Gauge(name='baromrelin', documentation='baromrelin', unit='in')
