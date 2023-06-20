@@ -27,7 +27,7 @@ for whom this will be a difficult time.
 | Variable           | Default | Choices      | Meaning                                       | Not yet supported           |
 |--------------------|---------|--------------|-----------------------------------------------|-----------------------------|
 | `DEBUG`            |         | Anything     | Enable extra output for debugging             |                             |
-| `TEMPERATURE_UNIT` | `c`     | `c`, `f`     | Temperature in Celcius or Fahrenheit          |                             |
+| `TEMPERATURE_UNIT` | `c`     | `c`, `f`     | Temperature in Celsius or Fahrenheit          |                             |
 | `PRESSURE_UNIT`    | `hpa`   | `hpa`, `in`  | Pressure in Hectopascals or inches of mercury | `mmhg`                      |
 | `WIND_UNIT`        | `kmh`   | `kmh`, `mph` | Speed in kilometres/hour or miles/hour        | `ms`, `knots`, `fpm`, `bft` |
 | `RAIN_UNIT`        | `mm`    | `mm`, `in`   | Rainfall in millimetres or inches             |                             |
