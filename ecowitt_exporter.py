@@ -20,7 +20,6 @@ def version():
 
 @app.route('/report', methods=['POST'])
 def logEcowitt():
-    fields = ''
 
     for key in request.form:
         value = request.form[key]
