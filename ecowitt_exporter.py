@@ -37,7 +37,7 @@ def logEcowitt():
     if debug:
         print('HEADERS')
         print(request.headers)
-        body = request.get_data()
+        body = request.get_data(as_text=True)
         print('BODY')
         print(body)
         print('FORM DATA')
