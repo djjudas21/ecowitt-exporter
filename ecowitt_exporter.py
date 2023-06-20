@@ -31,11 +31,14 @@ def version():
 @app.route('/report', methods=['POST'])
 def logEcowitt():
 
-    if debug:
-        print(request.form)
+    # Retrieve the POST body
+    data = request.form
 
-    for key in request.form:
-        value = request.form[key]
+    if debug:
+        print(data)
+
+    for key in data:
+        value = data[key]
 
         if debug:
             print(f"  Received raw value {key}: {value}")
