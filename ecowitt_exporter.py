@@ -31,13 +31,15 @@ def version():
 @app.route('/report', methods=['POST'])
 def logEcowitt():
 
+    # This must be accessed before anything else
+    body = request.get_data(as_text=True)
+
     # Retrieve the POST body
     data = request.form
 
     if debug:
         print('HEADERS')
         print(request.headers)
-        body = request.get_data(as_text=True)
         print('BODY')
         print(body)
         print('FORM DATA')
