@@ -33,11 +33,14 @@ def version():
 @app.route('/report', methods=['POST'])
 def logEcowitt():
 
-    if debug is 'TRUE':
-        print(request.data)
+    if debug == 'TRUE':
+        print(request.form)
 
     for key in request.form:
         value = request.form[key]
+
+        if debug == 'TRUE':
+            print(f"  Received raw value {key}: {value}")
 
         # Ignore these fields
         if key in ['PASSKEY', 'stationtype', 'dateutc', 'wh65batt', 'wh25batt', 'batt1', 'batt2', 'freq', 'model', 'runtime']:
