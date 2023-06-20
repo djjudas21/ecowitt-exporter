@@ -37,10 +37,38 @@ for whom this will be a difficult time.
 
 ## Testing
 
-Example data sent from the Ecowitt weather station via a POST request can be simulated with curl:
+Real data captured from the Ecowitt weather station with [http-webhook](https://artifacthub.io/packages/helm/securecodebox/http-webhook) to be used as a test:
+
+```json
+{
+    "path": "/report",
+    "headers": {
+        "host": "192.168.0.65",
+        "connection": "Close",
+        "content-type": "application/x-www-form-urlencoded",
+        "content-length": "493"
+    },
+    "method": "POST",
+    "body": "PASSKEY=573AF40DB42C66057D20631F706CD585&stationtype=EasyWeatherPro_V5.1.1&runtime=1&dateutc=2023-06-20+14:56:02&tempinf=73.4&humidityin=49&baromrelin=29.917&baromabsin=29.536&tempf=72.5&humidity=58&winddir=251&windspeedmph=1.12&windgustmph=2.24&maxdailygust=9.17&solarradiation=293.99&uv=2&rainratein=0.000&eventrainin=0.638&hourlyrainin=0.000&dailyrainin=0.638&weeklyrainin=0.650&monthlyrainin=0.650&yearlyrainin=0.650&totalrainin=0.650&wh65batt=0&freq=868M&model=WS2900_V2.01.18&interval=60",
+    "fresh": false,
+    "hostname": "192.168.0.65",
+    "ip": "::ffff:10.1.199.64",
+    "ips": [],
+    "protocol": "http",
+    "query": {},
+    "subdomains": [],
+    "xhr": false,
+    "os": {
+        "hostname": "http-webhook-6675856576-j2jzb"
+    },
+    "connection": {}
+}
+```
+
+This POST request can be simulated with curl:
 
 ```
-curl -d "tempinf=78.6&humidityin=46&baromrelin=29.955&baromabsin=29.574&tempf=71.8&humidity=50&winddir=186&windspeedmph=2.01&windgustmph=3.36&maxdailygust=13.65&solarradiation=50.32&uv=0&rainratein=0.000&eventrainin=0.000&hourlyrainin=0.000&dailyrainin=0.000&weeklyrainin=0.012&monthlyrainin=0.012&yearlyrainin=0.012&totalrainin=0.012" -X POST http://localhost:8088/report
+curl -d "PASSKEY=573AF40DB42C66057D20631F706CD585&stationtype=EasyWeatherPro_V5.1.1&runtime=1&dateutc=2023-06-20+14:56:02&tempinf=73.4&humidityin=49&baromrelin=29.917&baromabsin=29.536&tempf=72.5&humidity=58&winddir=251&windspeedmph=1.12&windgustmph=2.24&maxdailygust=9.17&solarradiation=293.99&uv=2&rainratein=0.000&eventrainin=0.638&hourlyrainin=0.000&dailyrainin=0.638&weeklyrainin=0.650&monthlyrainin=0.650&yearlyrainin=0.650&totalrainin=0.650&wh65batt=0&freq=868M&model=WS2900_V2.01.18&interval=60" -X POST http://192.168.0.65:8080/report
 ```
 
 We can then view the corresponding Prometheus metrics with a simple GET request (output has been truncated because it is very long):
