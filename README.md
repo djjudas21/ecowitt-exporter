@@ -14,6 +14,12 @@ This exporter runs on a single HTTP port (default `8088`) and provides two endpo
 * `/report` where the Ecowitt weather station should POST its data
 * `/metrics` where Prometheus can scape metrics with a GET request
 
+## Environment variables
+
+| Variable           | Default | Choices         | Meaning                                       | Not yet supported           |
+|--------------------|---------|-----------------|-----------------------------------------------|-----------------------------|
+| `DEBUG`            | `FALSE` | `FALSE`, `TRUE` | Enable extra output for debugging             |                             |
+
 ## How to configure your weather station
 
 ## Testing

@@ -6,11 +6,13 @@ import os
 app = Flask(__name__)
 
 station_id = os.environ.get('STATION_ID', 'my-station')
+debug = os.environ.get('DEBUG', "FALSE")
 
 print ("Ecowitt Exporter v0.1")
 print ("==============")
 print ("Configuration:")
 print ("  STATION_ID:      " + station_id)
+print ("  DEBUG:           " + debug)
 
 
 @app.route('/')
@@ -20,6 +22,9 @@ def version():
 
 @app.route('/report', methods=['POST'])
 def logEcowitt():
+
+    if debug is 'TRUE':
+        print(request.data)
 
     for key in request.form:
         value = request.form[key]
