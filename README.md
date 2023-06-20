@@ -24,14 +24,14 @@ alternatives, while Brits will likely want a mixture of both!
 All units are expressed in lower case and without slashes, for simplicity. Apologies to scientists,
 for whom this will be a difficult time.
 
-| Variable           | Default | Choices         | Meaning                                       | Not yet supported           |
-|--------------------|---------|-----------------|-----------------------------------------------|-----------------------------|
-| `DEBUG`            | `FALSE` | `FALSE`, `TRUE` | Enable extra output for debugging             |                             |
-| `TEMPERATURE_UNIT` | `c`     | `c`, `f`        | Temperature in Celcius or Fahrenheit          |                             |
-| `PRESSURE_UNIT`    | `hpa`   | `hpa`, `in`     | Pressure in Hectopascals or inches of mercury | `mmhg`                      |
-| `WIND_UNIT`        | `kmh`   | `kmh`, `mph`    | Speed in kilometres/hour or miles/hour        | `ms`, `knots`, `fpm`, `bft` |
-| `RAIN_UNIT`        | `mm`    | `mm`, `in`      | Rainfall in millimetres or inches             |                             |
-| `IRRADIANCE_UNIT`  | `wm2`   | `wm2`           | Solar irradiance in Watts/m^2                 | `lx`, `fc`                  |
+| Variable           | Default | Choices      | Meaning                                       | Not yet supported           |
+|--------------------|---------|--------------|-----------------------------------------------|-----------------------------|
+| `DEBUG`            |         | Anything     | Enable extra output for debugging             |                             |
+| `TEMPERATURE_UNIT` | `c`     | `c`, `f`     | Temperature in Celcius or Fahrenheit          |                             |
+| `PRESSURE_UNIT`    | `hpa`   | `hpa`, `in`  | Pressure in Hectopascals or inches of mercury | `mmhg`                      |
+| `WIND_UNIT`        | `kmh`   | `kmh`, `mph` | Speed in kilometres/hour or miles/hour        | `ms`, `knots`, `fpm`, `bft` |
+| `RAIN_UNIT`        | `mm`    | `mm`, `in`   | Rainfall in millimetres or inches             |                             |
+| `IRRADIANCE_UNIT`  | `wm2`   | `wm2`        | Solar irradiance in Watts/m^2                 | `lx`, `fc`                  |
 
 ## How to configure your weather station
 

@@ -6,7 +6,7 @@ import os
 app = Flask(__name__)
 
 station_id = os.environ.get('STATION_ID', 'my-station')
-debug = os.environ.get('DEBUG', "FALSE")
+debug = os.environ.get('DEBUG', None)
 temperature_unit = os.environ.get('TEMPERATURE_UNIT', 'c')
 pressure_unit = os.environ.get('PRESSURE_UNIT', 'hpa')
 wind_unit = os.environ.get('WIND_UNIT', 'kmh')
@@ -33,13 +33,13 @@ def version():
 @app.route('/report', methods=['POST'])
 def logEcowitt():
 
-    if debug == 'TRUE':
+    if debug:
         print(request.form)
 
     for key in request.form:
         value = request.form[key]
 
-        if debug == 'TRUE':
+        if debug:
             print(f"  Received raw value {key}: {value}")
 
         # Ignore these fields
@@ -141,4 +141,4 @@ if __name__ == "__main__":
     app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
         '/metrics': make_wsgi_app()
     })
-    app.run(host="0.0.0.0", port=8088, debug=True)
+    app.run(host="0.0.0.0", port=8088)
