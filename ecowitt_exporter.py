@@ -5,7 +5,6 @@ import os
 
 app = Flask(__name__)
 
-station_id = os.environ.get('STATION_ID', 'my-station')
 debug = os.environ.get('DEBUG', None)
 temperature_unit = os.environ.get('TEMPERATURE_UNIT', 'c')
 pressure_unit = os.environ.get('PRESSURE_UNIT', 'hpa')
@@ -16,7 +15,6 @@ irradiance_unit = os.environ.get('IRRADIANCE_UNIT', 'wm2')
 print ("Ecowitt Exporter v0.1")
 print ("==============")
 print ("Configuration:")
-print ('  STATION_ID:       ' + station_id)
 print ('  DEBUG:            ' + debug)
 print ('  TEMPERATURE_UNIT: ' + temperature_unit)
 print ('  PRESSURE_UNIT:    ' + pressure_unit)
