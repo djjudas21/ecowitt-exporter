@@ -35,6 +35,7 @@ def logEcowitt():
     data = request.form
 
     if debug:
+        print(request.headers)
         print(data)
 
     for key in data:
