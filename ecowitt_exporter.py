@@ -31,10 +31,22 @@ def version():
 @app.route('/report', methods=['POST'])
 def logEcowitt():
 
+    # This must be accessed before anything else
+    body = request.get_data(as_text=True)
 
     # Retrieve the POST body
-    for field in request.get_data(as_text=True).split('&'):
-        [key, value] = field.split('=')
+    data = request.form
+
+    if debug:
+        print('HEADERS')
+        print(request.headers)
+        print('BODY')
+        print(body)
+        print('FORM DATA')
+        print(data)
+
+    for key in data:
+        value = data[key]
 
         if debug:
             print(f"  Received raw value {key}: {value}")
