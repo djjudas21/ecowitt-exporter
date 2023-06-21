@@ -5,15 +5,15 @@ from prometheus_client import make_wsgi_app, Gauge
 
 app = Flask(__name__)
 
-debug = os.environ.get('DEBUG', None)
+debug = os.environ.get('DEBUG', 'no')
 temperature_unit = os.environ.get('TEMPERATURE_UNIT', 'c')
 pressure_unit = os.environ.get('PRESSURE_UNIT', 'hpa')
 wind_unit = os.environ.get('WIND_UNIT', 'kmh')
 rain_unit = os.environ.get('RAIN_UNIT', 'mm')
 irradiance_unit = os.environ.get('IRRADIANCE_UNIT', 'wm2')
 
-print ("Ecowitt Exporter v0.1")
-print ("==============")
+print ("Ecowitt Exporter")
+print ("================")
 print ("Configuration:")
 print ('  DEBUG:            ' + debug)
 print ('  TEMPERATURE_UNIT: ' + temperature_unit)
@@ -34,7 +34,7 @@ def logecowitt():
     # Retrieve the POST body
     data = request.form
 
-    if debug:
+    if debug == 'yes':
         print('HEADERS')
         print(request.headers)
         print('FORM DATA')
@@ -43,7 +43,7 @@ def logecowitt():
     for key in data:
         value = data[key]
 
-        if debug:
+        if debug == 'yes':
             print(f"  Received raw value {key}: {value}")
 
         # Ignore these fields
