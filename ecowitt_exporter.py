@@ -25,7 +25,7 @@ print ('  IRRADIANCE_UNIT:  ' + irradiance_unit)
 
 @app.route('/')
 def version():
-    return "Ecowitt Exporter v0.1\n"
+    return "Ecowitt Exporter\n"
 
 
 @app.route('/report', methods=['POST'])
