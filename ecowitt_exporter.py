@@ -1,7 +1,7 @@
+import os
 from flask import Flask, request
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from prometheus_client import make_wsgi_app, Gauge
-import os
 
 app = Flask(__name__)
 
@@ -29,7 +29,7 @@ def version():
 
 
 @app.route('/report', methods=['POST'])
-def logEcowitt():
+def logecowitt():
 
     # Retrieve the POST body
     data = request.form
@@ -61,8 +61,8 @@ def logEcowitt():
         # Convert degrees Fahrenheit to Celsius
         if key in ['tempinf', 'tempf', 'temp1f', 'temp2f', 'temp3f', 'temp4f', 'temp5f', 'temp6f', 'temp7f', 'temp8f']:
             if temperature_unit == 'c':
-                tempC = (float(value) - 32) * 5/9
-                value = "{:.2f}".format(tempC)
+                tempc = (float(value) - 32) * 5/9
+                value = "{:.2f}".format(tempc)
             key = key[:-1]
             temperature[key].set(value)
 
@@ -86,8 +86,8 @@ def logEcowitt():
         # Convert rain inches to mm
         if key in ['rainratein', 'eventrainin', 'hourlyrainin', 'dailyrainin', 'weeklyrainin', 'monthlyrainin', 'yearlyrainin', 'totalrainin']:
             if rain_unit == 'mm':
-                mm = float(value) * 25.4
-                value = "{:.1f}".format(mm)
+                rainmm = float(value) * 25.4
+                value = "{:.1f}".format(rainmm)
             key = key[:-2]
             rain[key].set(value)
 
