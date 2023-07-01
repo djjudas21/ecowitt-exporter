@@ -12,7 +12,16 @@ Here I am building on his work to present the Ecowitt metrics as an exporter for
 This exporter runs on a single HTTP port (default `8088`) and provides two endpoints:
 
 * `/report` where the Ecowitt weather station should POST its data
-* `/metrics` where Prometheus can scape metrics with a GET request
+* `/metrics` where Prometheus can scrape metrics with a GET request
+
+## Note about Ecowitt firmware
+
+It seems that an Ecowitt WS2910 with firmware v5.1.1 has a bug when writing out HTTP headers, which causes it to not work with Flask.
+This [has been reported](https://github.com/pallets/werkzeug/issues/2734) to Flask, but closed as WONTFIX because the underlying problem
+is with the Ecowitt firmware.
+
+It is possible to work around this issue by fronting this exporter with an NGINX reverse proxy (such as a Kubernetes Ingress),
+because NGINX magically fixes the headers on the fly.
 
 ## Environment variables
 
@@ -26,14 +35,43 @@ for whom this will be a difficult time.
 
 | Variable           | Default | Choices      | Meaning                                       | Not yet supported           |
 |--------------------|---------|--------------|-----------------------------------------------|-----------------------------|
-| `DEBUG`            |         | Anything     | Enable extra output for debugging             |                             |
+| `DEBUG`            | `no`    | `no`, `yes`  | Enable extra output for debugging             |                             |
 | `TEMPERATURE_UNIT` | `c`     | `c`, `f`     | Temperature in Celsius or Fahrenheit          |                             |
 | `PRESSURE_UNIT`    | `hpa`   | `hpa`, `in`  | Pressure in Hectopascals or inches of mercury | `mmhg`                      |
 | `WIND_UNIT`        | `kmh`   | `kmh`, `mph` | Speed in kilometres/hour or miles/hour        | `ms`, `knots`, `fpm`, `bft` |
 | `RAIN_UNIT`        | `mm`    | `mm`, `in`   | Rainfall in millimetres or inches             |                             |
 | `IRRADIANCE_UNIT`  | `wm2`   | `wm2`        | Solar irradiance in Watts/m^2                 | `lx`, `fc`                  |
 
+If you want to use one of the units that is not yet supported, please [open an issue](https://github.com/djjudas21/ecowitt-exporter/issues)
+and request it. I can add the code to convert and display other units if there is demand.
+
+## Deployment
+
+This project is available as a Docker image [djjudas21/ecowitt-exporter](https://hub.docker.com/r/djjudas21/ecowitt-exporter) which can be run as a
+standalone container, but the recommended way to run it is in Kubernetes via the [Helm chart](https://github.com/djjudas21/charts/tree/main/charts/ecowitt-exporter).
+The Helm chart also supports integration with the [Prometheus Operator](https://github.com/prometheus-operator/prometheus-operator) and will
+create ServiceMonitor resources to enable automatic scraping.
+
+```console
+helm repo add djjudas21 https://djjudas21.github.io/charts/
+helm repo update djjudas21
+helm install -n monitoring ecowitt-exporter djjudas21/ecowitt-exporter
+```
+
 ## How to configure your weather station
+
+After deploying via Helm, it will print some output to explain how to find the IP and/or hostname of the exporter running in Kubernetes.
+
+Use the WSView Plus all to configure the integration. Go into the device, scroll across until Customized and set the following:
+
+* Customized: Enable
+* Protocol: Ecowitt
+* Server IP / Hostname: the IP or hostname that Helm gave you
+* Path: `/report`
+* Port: `8088` unless you are using an Ingress, in which case probably `80`
+* Upload interval: `60`
+
+Then hit Save. It seems to take a couple of minutes for the weather station to submit its first reading.
 
 ## Testing
 

@@ -1,19 +1,19 @@
+import os
 from flask import Flask, request
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from prometheus_client import make_wsgi_app, Gauge
-import os
 
 app = Flask(__name__)
 
-debug = os.environ.get('DEBUG', None)
+debug = os.environ.get('DEBUG', 'no')
 temperature_unit = os.environ.get('TEMPERATURE_UNIT', 'c')
 pressure_unit = os.environ.get('PRESSURE_UNIT', 'hpa')
 wind_unit = os.environ.get('WIND_UNIT', 'kmh')
 rain_unit = os.environ.get('RAIN_UNIT', 'mm')
 irradiance_unit = os.environ.get('IRRADIANCE_UNIT', 'wm2')
 
-print ("Ecowitt Exporter v0.1")
-print ("==============")
+print ("Ecowitt Exporter")
+print ("================")
 print ("Configuration:")
 print ('  DEBUG:            ' + debug)
 print ('  TEMPERATURE_UNIT: ' + temperature_unit)
@@ -25,16 +25,16 @@ print ('  IRRADIANCE_UNIT:  ' + irradiance_unit)
 
 @app.route('/')
 def version():
-    return "Ecowitt Exporter v0.1\n"
+    return "Ecowitt Exporter\n"
 
 
 @app.route('/report', methods=['POST'])
-def logEcowitt():
+def logecowitt():
 
     # Retrieve the POST body
     data = request.form
 
-    if debug:
+    if debug == 'yes':
         print('HEADERS')
         print(request.headers)
         print('FORM DATA')
@@ -43,7 +43,7 @@ def logEcowitt():
     for key in data:
         value = data[key]
 
-        if debug:
+        if debug == 'yes':
             print(f"  Received raw value {key}: {value}")
 
         # Ignore these fields
@@ -61,8 +61,8 @@ def logEcowitt():
         # Convert degrees Fahrenheit to Celsius
         if key in ['tempinf', 'tempf', 'temp1f', 'temp2f', 'temp3f', 'temp4f', 'temp5f', 'temp6f', 'temp7f', 'temp8f']:
             if temperature_unit == 'c':
-                tempC = (float(value) - 32) * 5/9
-                value = "{:.2f}".format(tempC)
+                tempc = (float(value) - 32) * 5/9
+                value = "{:.2f}".format(tempc)
             key = key[:-1]
             temperature[key].set(value)
 
@@ -86,8 +86,8 @@ def logEcowitt():
         # Convert rain inches to mm
         if key in ['rainratein', 'eventrainin', 'hourlyrainin', 'dailyrainin', 'weeklyrainin', 'monthlyrainin', 'yearlyrainin', 'totalrainin']:
             if rain_unit == 'mm':
-                mm = float(value) * 25.4
-                value = "{:.1f}".format(mm)
+                rainmm = float(value) * 25.4
+                value = "{:.1f}".format(rainmm)
             key = key[:-2]
             rain[key].set(value)
 
