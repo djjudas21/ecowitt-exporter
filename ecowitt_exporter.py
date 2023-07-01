@@ -47,11 +47,11 @@ def logEcowitt():
             print(f"  Received raw value {key}: {value}")
 
         # Ignore these fields
-        if key in ['PASSKEY', 'stationtype', 'dateutc', 'wh65batt', 'wh25batt', 'batt1', 'batt2', 'freq', 'model', 'runtime']:
+        if key in ['PASSKEY', 'stationtype', 'dateutc', 'wh25batt', 'batt1', 'batt2', 'freq', 'model', 'runtime']:
             continue
 
         # No conversions needed
-        if key in ['humidity', 'humidityin', 'winddir', 'uv', 'pm25_ch1', 'pm25_avg_24h_ch1']:
+        if key in ['humidity', 'humidityin', 'winddir', 'uv', 'pm25_ch1', 'pm25_avg_24h_ch1', 'pm25batt1', 'wh65batt']:
             generic[key].set(value)
 
         # Solar irradiance
@@ -120,7 +120,9 @@ if __name__ == "__main__":
     generic['uv'] = Gauge(name='uv', documentation='UV index')
     generic['pm25_ch1'] = Gauge(name='pm25', documentation='PM2.5')
     generic['pm25_avg_24h_ch1'] = Gauge(name='pm25_avg_24h', documentation='PM2.5 24-hour average')
-    
+    generic['pm25batt1'] = Gauge(name='pm25batt', documentation='PM2.5 sensor battery')
+    generic['wh65batt'] = Gauge(name='wh65batt', documentation='Weather station battery status')
+
     irradiance={}
     irradiance['solarradiation'] = Gauge(name='solarradiation', documentation='Solar irradiance', unit='wm2')
 
