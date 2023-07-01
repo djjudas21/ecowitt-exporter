@@ -51,7 +51,7 @@ def logEcowitt():
             continue
 
         # No conversions needed
-        if key in ['humidity', 'humidityin', 'winddir', 'uv']:
+        if key in ['humidity', 'humidityin', 'winddir', 'uv', 'pm25_ch1', 'pm25_avg_24h_ch1']:
             generic[key].set(value)
 
         # Solar irradiance
@@ -118,6 +118,8 @@ if __name__ == "__main__":
     generic['humidityin'] = Gauge(name='humidityin', documentation='Indoor humidity', unit='percent')
     generic['winddir'] = Gauge(name='winddir', documentation='Wind direction', unit='degree')
     generic['uv'] = Gauge(name='uv', documentation='UV index')
+    generic['pm25_ch1'] = Gauge(name='pm25', documentation='PM2.5')
+    generic['pm25_avg_24h_ch1'] = Gauge(name='pm25_avg_24h', documentation='PM2.5 24-hour average')
     
     irradiance={}
     irradiance['solarradiation'] = Gauge(name='solarradiation', documentation='Solar irradiance', unit='wm2')
