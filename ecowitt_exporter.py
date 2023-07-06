@@ -2,7 +2,7 @@ import os
 from flask import Flask, request
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from prometheus_client import make_wsgi_app, Gauge
-from influxdb_client import InfluxDBClient, Point, WritePrecision
+from influxdb_client import InfluxDBClient
 from influxdb_client.client.write_api import SYNCHRONOUS
 
 app = Flask(__name__)
