@@ -1,6 +1,6 @@
 # ecowitt-exporter
 
-Ecowitt exporter for Prometheus
+Ecowitt exporter for Prometheus & InfluxDB
 
 The WiFi-enabled Ecowitt weather stations can export metrics in a number of protocols to various online weather services, as a push operation.
 They also support pushing to a custom endpoint in a choice of two protocols, Ecowitt or Wunderground. Blogger Ernest Neijenhuis has
@@ -33,14 +33,20 @@ alternatives, while Brits will likely want a mixture of both!
 All units are expressed in lower case and without slashes, for simplicity. Apologies to scientists,
 for whom this will be a difficult time.
 
-| Variable           | Default | Choices      | Meaning                                       | Not yet supported           |
-|--------------------|---------|--------------|-----------------------------------------------|-----------------------------|
-| `DEBUG`            | `no`    | `no`, `yes`  | Enable extra output for debugging             |                             |
-| `TEMPERATURE_UNIT` | `c`     | `c`, `f`     | Temperature in Celsius or Fahrenheit          |                             |
-| `PRESSURE_UNIT`    | `hpa`   | `hpa`, `in`  | Pressure in Hectopascals or inches of mercury | `mmhg`                      |
-| `WIND_UNIT`        | `kmh`   | `kmh`, `mph` | Speed in kilometres/hour or miles/hour        | `ms`, `knots`, `fpm`, `bft` |
-| `RAIN_UNIT`        | `mm`    | `mm`, `in`   | Rainfall in millimetres or inches             |                             |
-| `IRRADIANCE_UNIT`  | `wm2`   | `wm2`        | Solar irradiance in Watts/m^2                 | `lx`, `fc`                  |
+| Variable           | Default                  | Choices      | Meaning                                                                                |
+|--------------------|--------------------------|--------------|----------------------------------------------------------------------------------------|
+| `DEBUG`            | `no`                     | `no`, `yes`  | Enable extra output for debugging                                                      |
+| `PROMETHEUS`       | `yes`                    | `no`, `yes`  | Enable Prometheus exporter                                                             |
+| `INFLUXDB`         | `no`                     | `no`, `yes`  | Enable InfluxDB support                                                                |
+| `TEMPERATURE_UNIT` | `c`                      | `c`, `f`     | Temperature in Celsius or Fahrenheit. Not yet supported: `k`                           |
+| `PRESSURE_UNIT`    | `hpa`                    | `hpa`, `in`  | Pressure in Hectopascals or inches of mercury. Not yet supported: `mmhg`               |
+| `WIND_UNIT`        | `kmh`                    | `kmh`, `mph` | Speed in kilometres/hour or miles/hour. Not yet supported: `ms`, `knots`, `fpm`, `bft` |
+| `RAIN_UNIT`        | `mm`                     | `mm`, `in`   | Rainfall in millimetres or inches                                                      |
+| `IRRADIANCE_UNIT`  | `wm2`                    | `wm2`        | Solar irradiance in Watts/m^2. Not yet supported: `lx`, `fc`                           |
+| `INFLUXDB_TOKEN`   | `no-token`               |              | InfluxDB                                                                               |
+| `INFLUXDB_URL`     | `http://localhost:8086/` |              | InfluxDB endpoint                                                                      |
+| `INFLUXDB_ORG`     | `my-weather-station`     |              |                                                                                        |
+| `INFLUXDB_BUCKET`  | `ecowitt`                |              |                                                                                        |
 
 If you want to use one of the units that is not yet supported, please [open an issue](https://github.com/djjudas21/ecowitt-exporter/issues)
 and request it. I can add the code to convert and display other units if there is demand.
