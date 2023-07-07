@@ -2,7 +2,7 @@ import os
 from flask import Flask, request
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from prometheus_client import make_wsgi_app, Gauge
-from influxdb_client import InfluxDBClient
+from influxdb_client import InfluxDBClient, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
 
 app = Flask(__name__)
@@ -17,7 +17,7 @@ influxdb_token = os.environ.get('INFLUXDB_TOKEN', 'no-token')
 influxdb_url = os.environ.get('INFLUXDB_URL', 'http://localhost:8086/')
 influxdb_org = os.environ.get('INFLUXDB_ORG', 'my-weather-station')
 influxdb_bucket = os.environ.get('INFLUXDB_BUCKET', 'ecowitt')
-station_id = os.environ.get('STATION_ID', 'my-station')
+station_id = os.environ.get('STATION_ID', 'ecowitt')
 prometheus = os.environ.get('PROMETHEUS', 'yes')
 influxdb = os.environ.get('INFLUXDB', 'no')
 
@@ -112,23 +112,23 @@ def logecowitt():
             results[key] = value
 
     # Now loop on our processed results and do things with them
+    points = []
     for key, value in results:
         # Send the data to the Prometheus exporter
         if prometheus == 'yes':
             metrics[key].set(value)
 
-        # Build a string to send to InfluxDB
-        if fields:
-            fields += "," + key + "=" + value
-        else:
-            fields = key + "=" + value
+        # Build an array of points to send to InfluxDB
+        if influxdb == 'yes':
+            point = Point("weather").tag("station_id", station_id).field(key, value)
+            points.append(point)
 
     # Send the data to InfluxDB
     if influxdb == 'yes':
         with InfluxDBClient(url=influxdb_url, token=influxdb_token, org=influxdb_org) as client:
             write_api = client.write_api(write_options=SYNCHRONOUS)
             data = f"weather,station_id={station_id} {fields}"
-            write_api.write(influxdb_bucket, influxdb_org, data)
+            write_api.write(bucket=influxdb_bucket, record=p)
 
     # Return a 200 to the weather station
     response = app.response_class(
