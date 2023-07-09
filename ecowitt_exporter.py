@@ -113,7 +113,7 @@ def logecowitt():
 
     # Now loop on our processed results and do things with them
     points = []
-    for key, value in results:
+    for key, value in results.items():
         # Send the data to the Prometheus exporter
         if prometheus == 'yes':
             metrics[key].set(value)
