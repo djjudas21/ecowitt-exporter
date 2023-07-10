@@ -1,4 +1,5 @@
 import os
+import logging
 from flask import Flask, request
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from prometheus_client import make_wsgi_app, Gauge
@@ -7,7 +8,7 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 
 app = Flask(__name__)
 
-debug = os.environ.get('DEBUG', 'no')
+debug = os.environ.get('DEBUG', 'no') == 'yes'
 temperature_unit = os.environ.get('TEMPERATURE_UNIT', 'c')
 pressure_unit = os.environ.get('PRESSURE_UNIT', 'hpa')
 wind_unit = os.environ.get('WIND_UNIT', 'kmh')
@@ -18,13 +19,13 @@ influxdb_url = os.environ.get('INFLUXDB_URL', 'http://localhost:8086/')
 influxdb_org = os.environ.get('INFLUXDB_ORG', 'my-weather-station')
 influxdb_bucket = os.environ.get('INFLUXDB_BUCKET', 'ecowitt')
 station_id = os.environ.get('STATION_ID', 'ecowitt')
-prometheus = os.environ.get('PROMETHEUS', 'yes')
-influxdb = os.environ.get('INFLUXDB', 'no')
+prometheus = os.environ.get('PROMETHEUS', 'yes') == 'yes'
+influxdb = os.environ.get('INFLUXDB', 'no') == 'yes'
 
 print ("Ecowitt Exporter")
 print ("================")
 print ("Configuration:")
-print ('  DEBUG:            ' + debug)
+print ('  DEBUG:            ' + str(debug))
 print ('  TEMPERATURE_UNIT: ' + temperature_unit)
 print ('  PRESSURE_UNIT:    ' + pressure_unit)
 print ('  WIND_UNIT:        ' + wind_unit)
@@ -35,12 +36,18 @@ print ('  INFLUXDB_URL:     ' + influxdb_url)
 print ('  INFLUXDB_ORG:     ' + influxdb_org)
 print ('  INFLUXDB_BUCKET:  ' + influxdb_bucket)
 print ('  STATION_ID:       ' + station_id)
-print ('  PROMETHEUS:       ' + prometheus)
-print ('  INFLUXDB:         ' + influxdb)
+print ('  PROMETHEUS:       ' + str(prometheus))
+print ('  INFLUXDB:         ' + str(influxdb))
 
 @app.route('/')
 def version():
     return "Ecowitt Exporter\n"
+
+
+@app.before_request
+def log_request_info():
+    app.logger.debug('Headers: %s', request.headers)
+    app.logger.debug('Body: %s', request.get_data())
 
 
 @app.route('/report', methods=['POST'])
@@ -49,12 +56,6 @@ def logecowitt():
     # Retrieve the POST body
     data = request.form
 
-    if debug == 'yes':
-        print('HEADERS')
-        print(request.headers)
-        print('FORM DATA')
-        print(data)
-
     # Set up a dict to receive the processed results
     results = {}
 
@@ -62,9 +63,7 @@ def logecowitt():
         # Process each key from the raw data, do unit conversions if necessary,
         # then store the results in a new dict called results
         value = data[key]
-
-        if debug == 'yes':
-            print(f"  Received raw value {key}: {value}")
+        app.logger.debug("Received raw value %s: %s", key, value)
 
         # Ignore these fields
         if key in ['PASSKEY', 'stationtype', 'dateutc', 'wh25batt', 'batt1', 'batt2', 'freq', 'model', 'runtime']:
@@ -115,16 +114,16 @@ def logecowitt():
     points = []
     for key, value in results.items():
         # Send the data to the Prometheus exporter
-        if prometheus == 'yes':
+        if prometheus:
             metrics[key].set(value)
 
         # Build an array of points to send to InfluxDB
-        if influxdb == 'yes':
+        if influxdb:
             point = Point("weather").tag("station_id", station_id).field(key, value)
             points.append(point)
 
     # Send the data to InfluxDB
-    if influxdb == 'yes':
+    if influxdb:
         with InfluxDBClient(url=influxdb_url, token=influxdb_token, org=influxdb_org) as client:
             write_api = client.write_api(write_options=SYNCHRONOUS)
             data = f"weather,station_id={station_id} {fields}"
@@ -175,9 +174,13 @@ if __name__ == "__main__":
     metrics['yearlyrain'] = Gauge(name='yearlyrain', documentation='Yearly rainfall', unit=rain_unit)
     metrics['totalrain'] = Gauge(name='totalrain', documentation='Total rainfall', unit=rain_unit)
 
+    # Increase Flask logging if in debug mode
+    if debug:
+        app.logger.setLevel(logging.DEBUG)
+
     # Add prometheus wsgi middleware to route /metrics requests
-    if prometheus == 'yes':
+    if prometheus:
         app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
             '/metrics': make_wsgi_app()
         })
-    app.run(host="0.0.0.0", port=8088)
+    app.run(host="0.0.0.0", port=8088, debug=debug)
