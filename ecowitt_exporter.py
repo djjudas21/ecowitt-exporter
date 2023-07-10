@@ -126,8 +126,7 @@ def logecowitt():
     if influxdb:
         with InfluxDBClient(url=influxdb_url, token=influxdb_token, org=influxdb_org) as client:
             write_api = client.write_api(write_options=SYNCHRONOUS)
-            data = f"weather,station_id={station_id} {fields}"
-            write_api.write(bucket=influxdb_bucket, record=p)
+            write_api.write(bucket=influxdb_bucket, record=points)
 
     # Return a 200 to the weather station
     response = app.response_class(
