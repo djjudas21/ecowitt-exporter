@@ -7,7 +7,7 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 
 app = Flask(__name__)
 
-debug = os.environ.get('DEBUG', 'no')
+debug = os.environ.get('DEBUG', 'no') == 'yes'
 temperature_unit = os.environ.get('TEMPERATURE_UNIT', 'c')
 pressure_unit = os.environ.get('PRESSURE_UNIT', 'hpa')
 wind_unit = os.environ.get('WIND_UNIT', 'kmh')
@@ -18,13 +18,13 @@ influxdb_url = os.environ.get('INFLUXDB_URL', 'http://localhost:8086/')
 influxdb_org = os.environ.get('INFLUXDB_ORG', 'my-weather-station')
 influxdb_bucket = os.environ.get('INFLUXDB_BUCKET', 'ecowitt')
 station_id = os.environ.get('STATION_ID', 'ecowitt')
-prometheus = os.environ.get('PROMETHEUS', 'yes')
-influxdb = os.environ.get('INFLUXDB', 'no')
+prometheus = os.environ.get('PROMETHEUS', 'yes') == 'yes'
+influxdb = os.environ.get('INFLUXDB', 'no') == 'yes'
 
 print ("Ecowitt Exporter")
 print ("================")
 print ("Configuration:")
-print ('  DEBUG:            ' + debug)
+print ('  DEBUG:            ' + str(debug))
 print ('  TEMPERATURE_UNIT: ' + temperature_unit)
 print ('  PRESSURE_UNIT:    ' + pressure_unit)
 print ('  WIND_UNIT:        ' + wind_unit)
@@ -35,8 +35,8 @@ print ('  INFLUXDB_URL:     ' + influxdb_url)
 print ('  INFLUXDB_ORG:     ' + influxdb_org)
 print ('  INFLUXDB_BUCKET:  ' + influxdb_bucket)
 print ('  STATION_ID:       ' + station_id)
-print ('  PROMETHEUS:       ' + prometheus)
-print ('  INFLUXDB:         ' + influxdb)
+print ('  PROMETHEUS:       ' + str(prometheus))
+print ('  INFLUXDB:         ' + str(influxdb))
 
 @app.route('/')
 def version():
@@ -49,7 +49,7 @@ def logecowitt():
     # Retrieve the POST body
     data = request.form
 
-    if debug == 'yes':
+    if debug:
         print('HEADERS')
         print(request.headers)
         print('FORM DATA')
@@ -63,7 +63,7 @@ def logecowitt():
         # then store the results in a new dict called results
         value = data[key]
 
-        if debug == 'yes':
+        if debug:
             print(f"  Received raw value {key}: {value}")
 
         # Ignore these fields
@@ -115,16 +115,16 @@ def logecowitt():
     points = []
     for key, value in results.items():
         # Send the data to the Prometheus exporter
-        if prometheus == 'yes':
+        if prometheus:
             metrics[key].set(value)
 
         # Build an array of points to send to InfluxDB
-        if influxdb == 'yes':
+        if influxdb:
             point = Point("weather").tag("station_id", station_id).field(key, value)
             points.append(point)
 
     # Send the data to InfluxDB
-    if influxdb == 'yes':
+    if influxdb:
         with InfluxDBClient(url=influxdb_url, token=influxdb_token, org=influxdb_org) as client:
             write_api = client.write_api(write_options=SYNCHRONOUS)
             data = f"weather,station_id={station_id} {fields}"
@@ -176,7 +176,7 @@ if __name__ == "__main__":
     metrics['totalrain'] = Gauge(name='totalrain', documentation='Total rainfall', unit=rain_unit)
 
     # Add prometheus wsgi middleware to route /metrics requests
-    if prometheus == 'yes':
+    if prometheus:
         app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
             '/metrics': make_wsgi_app()
         })
