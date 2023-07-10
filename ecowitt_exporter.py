@@ -1,4 +1,5 @@
 import os
+import logging
 from flask import Flask, request
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from prometheus_client import make_wsgi_app, Gauge
@@ -43,17 +44,17 @@ def version():
     return "Ecowitt Exporter\n"
 
 
+@app.before_request
+def log_request_info():
+    app.logger.debug('Headers: %s', request.headers)
+    app.logger.debug('Body: %s', request.get_data())
+
+
 @app.route('/report', methods=['POST'])
 def logecowitt():
 
     # Retrieve the POST body
     data = request.form
-
-    if debug:
-        print('HEADERS')
-        print(request.headers)
-        print('FORM DATA')
-        print(data)
 
     # Set up a dict to receive the processed results
     results = {}
@@ -62,9 +63,7 @@ def logecowitt():
         # Process each key from the raw data, do unit conversions if necessary,
         # then store the results in a new dict called results
         value = data[key]
-
-        if debug:
-            print(f"  Received raw value {key}: {value}")
+        app.logger.debug("Received raw value %s: %s", key, value)
 
         # Ignore these fields
         if key in ['PASSKEY', 'stationtype', 'dateutc', 'wh25batt', 'batt1', 'batt2', 'freq', 'model', 'runtime']:
@@ -175,9 +174,13 @@ if __name__ == "__main__":
     metrics['yearlyrain'] = Gauge(name='yearlyrain', documentation='Yearly rainfall', unit=rain_unit)
     metrics['totalrain'] = Gauge(name='totalrain', documentation='Total rainfall', unit=rain_unit)
 
+    # Increase Flask logging if in debug mode
+    if debug:
+        app.logger.setLevel(logging.DEBUG)
+
     # Add prometheus wsgi middleware to route /metrics requests
     if prometheus:
         app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
             '/metrics': make_wsgi_app()
         })
-    app.run(host="0.0.0.0", port=8088)
+    app.run(host="0.0.0.0", port=8088, debug=debug)
