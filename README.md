@@ -43,10 +43,10 @@ for whom this will be a difficult time.
 | `WIND_UNIT`        | `kmh`                    | `kmh`, `mph` | Speed in kilometres/hour or miles/hour. Not yet supported: `ms`, `knots`, `fpm`, `bft` |
 | `RAIN_UNIT`        | `mm`                     | `mm`, `in`   | Rainfall in millimetres or inches                                                      |
 | `IRRADIANCE_UNIT`  | `wm2`                    | `wm2`        | Solar irradiance in Watts/m^2. Not yet supported: `lx`, `fc`                           |
-| `INFLUXDB_TOKEN`   |                          |              | InfluxDB                                                                               |
+| `INFLUXDB_TOKEN`   |                          |              | InfluxDB token                                                                         |
 | `INFLUXDB_URL`     | `http://localhost:8086/` |              | InfluxDB endpoint                                                                      |
-| `INFLUXDB_ORG`     |                          |              |                                                                                        |
-| `INFLUXDB_BUCKET`  | `ecowitt`                |              |                                                                                        |
+| `INFLUXDB_ORG`     | `influxdata`             |              | InfluxDB organisation                                                                  |
+| `INFLUXDB_BUCKET`  | `default`                |              | InfluxDB bucket                                                                        |
 
 If you want to use one of the units that is not yet supported, please [open an issue](https://github.com/djjudas21/ecowitt-exporter/issues)
 and request it. I can add the code to convert and display other units if there is demand.

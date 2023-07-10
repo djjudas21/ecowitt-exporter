@@ -16,8 +16,8 @@ rain_unit = os.environ.get('RAIN_UNIT', 'mm')
 irradiance_unit = os.environ.get('IRRADIANCE_UNIT', 'wm2')
 influxdb_token = os.environ.get('INFLUXDB_TOKEN', None)
 influxdb_url = os.environ.get('INFLUXDB_URL', 'http://localhost:8086/')
-influxdb_org = os.environ.get('INFLUXDB_ORG', None)
-influxdb_bucket = os.environ.get('INFLUXDB_BUCKET', 'ecowitt')
+influxdb_org = os.environ.get('INFLUXDB_ORG', 'influxdata')
+influxdb_bucket = os.environ.get('INFLUXDB_BUCKET', 'default')
 station_id = os.environ.get('STATION_ID', 'ecowitt')
 prometheus = os.environ.get('PROMETHEUS', 'yes') == 'yes'
 influxdb = os.environ.get('INFLUXDB', 'no') == 'yes'
