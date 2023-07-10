@@ -116,10 +116,12 @@ def logecowitt():
         # Send the data to the Prometheus exporter
         if prometheus:
             metrics[key].set(value)
+            app.logger.debug("Set Prometheus metric %s: %s", key, value)
 
         # Build an array of points to send to InfluxDB
         if influxdb:
             point = Point("weather").tag("station_id", station_id).field(key, value)
+            app.logger.debug("Created InfluxDB point %s: %s", key, value)
             points.append(point)
 
     # Send the data to InfluxDB
@@ -127,6 +129,7 @@ def logecowitt():
         with InfluxDBClient(url=influxdb_url, token=influxdb_token, org=influxdb_org) as client:
             write_api = client.write_api(write_options=SYNCHRONOUS)
             write_api.write(bucket=influxdb_bucket, record=points)
+            app.logger.debug("Submitted InfluxDB points to server")
 
     # Return a 200 to the weather station
     response = app.response_class(
