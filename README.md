@@ -33,20 +33,20 @@ alternatives, while Brits will likely want a mixture of both!
 All units are expressed in lower case and without slashes, for simplicity. Apologies to scientists,
 for whom this will be a difficult time.
 
-| Variable           | Default                  | Choices           | Meaning                                                                                |
-|--------------------|--------------------------|-------------------|----------------------------------------------------------------------------------------|
-| `DEBUG`            | `no`                     | `no`, `yes`       | Enable extra output for debugging                                                      |
-| `PROMETHEUS`       | `yes`                    | `no`, `yes`       | Enable Prometheus exporter                                                             |
-| `INFLUXDB`         | `no`                     | `no`, `yes`       | Enable InfluxDB support                                                                |
-| `TEMPERATURE_UNIT` | `c`                      | `c`, `f`, `k`     | Temperature in Celsius, Fahrenheit or Kelvin                                           |
-| `PRESSURE_UNIT`    | `hpa`                    | `hpa`, `in`       | Pressure in Hectopascals or inches of mercury. Not yet supported: `mmhg`               |
-| `WIND_UNIT`        | `kmh`                    | `kmh`, `mph`      | Speed in kilometres/hour or miles/hour. Not yet supported: `ms`, `knots`, `fpm`, `bft` |
-| `RAIN_UNIT`        | `mm`                     | `mm`, `in`        | Rainfall in millimetres or inches                                                      |
-| `IRRADIANCE_UNIT`  | `wm2`                    | `wm2`, `lx`, `fc` | Solar irradiance in Watts/m^2                                                          |
-| `INFLUXDB_TOKEN`   |                          |                   | InfluxDB token                                                                         |
-| `INFLUXDB_URL`     | `http://localhost:8086/` |                   | InfluxDB endpoint                                                                      |
-| `INFLUXDB_ORG`     | `influxdata`             |                   | InfluxDB organisation                                                                  |
-| `INFLUXDB_BUCKET`  | `default`                |                   | InfluxDB bucket                                                                        |
+| Variable           | Default                  | Choices             | Meaning                                                                                |
+|--------------------|--------------------------|---------------------|----------------------------------------------------------------------------------------|
+| `DEBUG`            | `no`                     | `no`, `yes`         | Enable extra output for debugging                                                      |
+| `PROMETHEUS`       | `yes`                    | `no`, `yes`         | Enable Prometheus exporter                                                             |
+| `INFLUXDB`         | `no`                     | `no`, `yes`         | Enable InfluxDB support                                                                |
+| `TEMPERATURE_UNIT` | `c`                      | `c`, `f`, `k`       | Temperature in Celsius, Fahrenheit or Kelvin                                           |
+| `PRESSURE_UNIT`    | `hpa`                    | `hpa`, `in`, `mmhg` | Pressure in hectopascals (millibars), inches of mercury or mm of mercury               |
+| `WIND_UNIT`        | `kmh`                    | `kmh`, `mph`        | Speed in kilometres/hour or miles/hour. Not yet supported: `ms`, `knots`, `fpm`, `bft` |
+| `RAIN_UNIT`        | `mm`                     | `mm`, `in`          | Rainfall in millimetres or inches                                                      |
+| `IRRADIANCE_UNIT`  | `wm2`                    | `wm2`, `lx`, `fc`   | Solar irradiance in Watts/m^2                                                          |
+| `INFLUXDB_TOKEN`   |                          |                     | InfluxDB token                                                                         |
+| `INFLUXDB_URL`     | `http://localhost:8086/` |                     | InfluxDB endpoint                                                                      |
+| `INFLUXDB_ORG`     | `influxdata`             |                     | InfluxDB organisation                                                                  |
+| `INFLUXDB_BUCKET`  | `default`                |                     | InfluxDB bucket                                                                        |
 
 If you want to use one of the units that is not yet supported, please [open an issue](https://github.com/djjudas21/ecowitt-exporter/issues)
 and request it. I can add the code to convert and display other units if there is demand.

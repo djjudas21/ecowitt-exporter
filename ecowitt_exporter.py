@@ -142,6 +142,10 @@ def logecowitt():
                 # Convert inches Hg to hPa
                 pressurehpa = float(value) * 33.6585
                 value = "{:.2f}".format(pressurehpa)
+            if pressure_unit == 'mmhg':
+                # Convert inches Hg to mmHg
+                pressuremmhg = float(value) * 25.4
+                value = "{:.2f}".format(pressuremmhg)
             key = key[:-2]
             results[key] = value
 
