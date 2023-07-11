@@ -113,6 +113,14 @@ def logecowitt():
 
         # Solar irradiance, default W/m^2
         if key in ['solarradiation']:
+            if irradiance_unit == 'lx':
+                # Convert degrees W/m2 to lux
+                irradiance_lx = float(value) / 0.0079
+                value = "{:.2f}".format(irradiance_lx)
+            elif irradiance_unit == 'fc':
+                # Convert degrees W/m2 to foot candle
+                irradiance_lx = float(value) * 6.345
+                value = "{:.2f}".format(irradiance_lx)
             results[key] = value
 
         # Temperature, default Fahrenheit
