@@ -129,6 +129,10 @@ def logecowitt():
                 # Convert degrees Fahrenheit to Celsius
                 tempc = (float(value) - 32) * 5/9
                 value = "{:.2f}".format(tempc)
+            if temperature_unit == 'k':
+                # Convert degrees Fahrenheit to Kelvin
+                tempk = (float(value) - 32) * 5/9 + 273.15
+                value = "{:.2f}".format(tempk)
             key = key[:-1]
             results[key] = value
 

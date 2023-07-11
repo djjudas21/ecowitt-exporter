@@ -38,7 +38,7 @@ for whom this will be a difficult time.
 | `DEBUG`            | `no`                     | `no`, `yes`       | Enable extra output for debugging                                                      |
 | `PROMETHEUS`       | `yes`                    | `no`, `yes`       | Enable Prometheus exporter                                                             |
 | `INFLUXDB`         | `no`                     | `no`, `yes`       | Enable InfluxDB support                                                                |
-| `TEMPERATURE_UNIT` | `c`                      | `c`, `f`          | Temperature in Celsius or Fahrenheit. Not yet supported: `k`                           |
+| `TEMPERATURE_UNIT` | `c`                      | `c`, `f`, `k`     | Temperature in Celsius, Fahrenheit or Kelvin                                           |
 | `PRESSURE_UNIT`    | `hpa`                    | `hpa`, `in`       | Pressure in Hectopascals or inches of mercury. Not yet supported: `mmhg`               |
 | `WIND_UNIT`        | `kmh`                    | `kmh`, `mph`      | Speed in kilometres/hour or miles/hour. Not yet supported: `ms`, `knots`, `fpm`, `bft` |
 | `RAIN_UNIT`        | `mm`                     | `mm`, `in`        | Rainfall in millimetres or inches                                                      |
