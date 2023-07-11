@@ -155,6 +155,18 @@ def logecowitt():
                 # Convert mph to km/h
                 speedkmh = float(value) * 1.60934
                 value = "{:.2f}".format(speedkmh)
+            elif wind_unit == 'ms':
+                # Convert mph to m/s
+                speedms = float(value) / 2.237
+                value = "{:.2f}".format(speedms)
+            elif wind_unit == 'knots':
+                # Convert mph to knots
+                speedknots = float(value) / 1.151
+                value = "{:.2f}".format(speedknots)
+            elif wind_unit == 'fps':
+                # Convert mph to fps
+                speedfps = float(value) * 1.467
+                value = "{:.2f}".format(speedfps)
             if key != 'maxdailygust':
                 key = key[:-3]
             results[key] = value
