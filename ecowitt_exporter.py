@@ -111,38 +111,70 @@ def logecowitt():
         if key in ['humidity', 'humidityin', 'winddir', 'uv', 'pm25_ch1', 'pm25_avg_24h_ch1', 'pm25batt1', 'wh65batt']:
             results[key] = value
 
-        # Solar irradiance
+        # Solar irradiance, default W/m^2
         if key in ['solarradiation']:
+            if irradiance_unit == 'lx':
+                # Convert degrees W/m2 to lux
+                irradiance_lx = float(value) / 0.0079
+                value = "{:.2f}".format(irradiance_lx)
+            elif irradiance_unit == 'fc':
+                # Convert degrees W/m2 to foot candle
+                irradiance_lx = float(value) * 6.345
+                value = "{:.2f}".format(irradiance_lx)
             results[key] = value
 
-        # Convert degrees Fahrenheit to Celsius
+        # Temperature, default Fahrenheit
         if key in ['tempinf', 'tempf', 'temp1f', 'temp2f', 'temp3f', 'temp4f', 'temp5f', 'temp6f', 'temp7f', 'temp8f']:
             if temperature_unit == 'c':
+                # Convert degrees Fahrenheit to Celsius
                 tempc = (float(value) - 32) * 5/9
                 value = "{:.2f}".format(tempc)
+            if temperature_unit == 'k':
+                # Convert degrees Fahrenheit to Kelvin
+                tempk = (float(value) - 32) * 5/9 + 273.15
+                value = "{:.2f}".format(tempk)
             key = key[:-1]
             results[key] = value
 
-        # Convert pressure inches to hPa
+        # Pressure, default inches Hg
         if key in ['baromrelin', 'baromabsin']:
             if pressure_unit == 'hpa':
+                # Convert inches Hg to hPa
                 pressurehpa = float(value) * 33.6585
                 value = "{:.2f}".format(pressurehpa)
+            if pressure_unit == 'mmhg':
+                # Convert inches Hg to mmHg
+                pressuremmhg = float(value) * 25.4
+                value = "{:.2f}".format(pressuremmhg)
             key = key[:-2]
             results[key] = value
 
-        # Convert speed mph to km/h
+        # Wind speed, default mph
         if key in ['windspeedmph', 'windgustmph', 'maxdailygust']:
             if wind_unit == 'kmh':
+                # Convert mph to km/h
                 speedkmh = float(value) * 1.60934
                 value = "{:.2f}".format(speedkmh)
+            elif wind_unit == 'ms':
+                # Convert mph to m/s
+                speedms = float(value) / 2.237
+                value = "{:.2f}".format(speedms)
+            elif wind_unit == 'knots':
+                # Convert mph to knots
+                speedknots = float(value) / 1.151
+                value = "{:.2f}".format(speedknots)
+            elif wind_unit == 'fps':
+                # Convert mph to fps
+                speedfps = float(value) * 1.467
+                value = "{:.2f}".format(speedfps)
             if key != 'maxdailygust':
                 key = key[:-3]
             results[key] = value
 
-        # Convert rain inches to mm
+        # Rainfall, default inches
         if key in ['rainratein', 'eventrainin', 'hourlyrainin', 'dailyrainin', 'weeklyrainin', 'monthlyrainin', 'yearlyrainin', 'totalrainin']:
             if rain_unit == 'mm':
+                # Convert inches to mm
                 rainmm = float(value) * 25.4
                 value = "{:.1f}".format(rainmm)
             key = key[:-2]
