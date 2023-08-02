@@ -13,6 +13,7 @@ temperature_unit = os.environ.get('TEMPERATURE_UNIT', 'c')
 pressure_unit = os.environ.get('PRESSURE_UNIT', 'hpa')
 wind_unit = os.environ.get('WIND_UNIT', 'kmh')
 rain_unit = os.environ.get('RAIN_UNIT', 'mm')
+distance_unit = os.environ.get('DISTANCE_UNIT', 'km')
 irradiance_unit = os.environ.get('IRRADIANCE_UNIT', 'wm2')
 influxdb_token = os.environ.get('INFLUXDB_TOKEN', None)
 influxdb_url = os.environ.get('INFLUXDB_URL', 'http://localhost:8086/')
@@ -30,6 +31,7 @@ print ('  TEMPERATURE_UNIT: ' + temperature_unit)
 print ('  PRESSURE_UNIT:    ' + pressure_unit)
 print ('  WIND_UNIT:        ' + wind_unit)
 print ('  RAIN_UNIT:        ' + rain_unit)
+print ('  DISTANCE_UNIT:    ' + distance_unit)
 print ('  IRRADIANCE_UNIT:  ' + irradiance_unit)
 print ('  INFLUXDB_TOKEN:   ' + str(influxdb_token))
 print ('  INFLUXDB_URL:     ' + influxdb_url)
@@ -108,7 +110,7 @@ def logecowitt():
             continue
 
         # No conversions needed
-        if key in ['humidity', 'humidityin', 'winddir', 'uv', 'pm25_ch1', 'pm25_avg_24h_ch1', 'pm25batt1', 'wh65batt']:
+        if key in ['humidity', 'humidityin', 'winddir', 'uv', 'pm25_ch1', 'pm25_avg_24h_ch1', 'pm25batt1', 'wh65batt', 'lightning_num']:
             results[key] = value
 
         # Solar irradiance, default W/m^2
@@ -180,6 +182,16 @@ def logecowitt():
             key = key[:-2]
             results[key] = value
 
+        # Lightning distance, default kilometers
+        if key in ['lightning']:
+            if distance_unit == 'km':
+                results[key] = value
+            elif distance_unit == 'mi':
+                # Convert km to miles
+                distancemi = float(value) / 1.60934
+                value = "{:.2f}".format(distancemi)
+                results[key] = value
+
     # Now loop on our processed results and do things with them
     points = []
     for key, value in results.items():
@@ -245,6 +257,8 @@ if __name__ == "__main__":
     metrics['monthlyrain'] = Gauge(name='monthlyrain', documentation='Monthly rainfall', unit=rain_unit)
     metrics['yearlyrain'] = Gauge(name='yearlyrain', documentation='Yearly rainfall', unit=rain_unit)
     metrics['totalrain'] = Gauge(name='totalrain', documentation='Total rainfall', unit=rain_unit)
+    metrics['lightning'] = Gauge(name='lightning', documentation='Lightning distance', unit=distance_unit)
+    metrics['lightning_num'] = Gauge(name='lightning_num', documentation='Lightning daily count')
 
     # Increase Flask logging if in debug mode
     if debug:
