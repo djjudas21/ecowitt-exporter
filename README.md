@@ -43,6 +43,7 @@ for whom this will be a difficult time.
 | `WIND_UNIT`        | `kmh`                    | `kmh`, `mph`, `ms`, `knots`, `fps` | Speed in km/hour, miles/hour, metres/second, knots or feet/second        |
 | `RAIN_UNIT`        | `mm`                     | `mm`, `in`                         | Rainfall in millimetres or inches                                        |
 | `IRRADIANCE_UNIT`  | `wm2`                    | `wm2`, `lx`, `fc`                  | Solar irradiance in Watts/m^2                                            |
+| `DISTANCE_UNIT`    | `km`                     | `km`, `mi`                         | Distance from the last lightning in kilometers                           |
 | `INFLUXDB_TOKEN`   |                          |                                    | InfluxDB token                                                           |
 | `INFLUXDB_URL`     | `http://localhost:8086/` |                                    | InfluxDB endpoint                                                        |
 | `INFLUXDB_ORG`     | `influxdata`             |                                    | InfluxDB organisation                                                    |
@@ -112,7 +113,7 @@ Real data captured from the Ecowitt weather station with [http-webhook](https://
 This POST request can be simulated with curl:
 
 ```
-curl -d "PASSKEY=573AF40DB42C66057D20631F706CD585&stationtype=EasyWeatherPro_V5.1.1&runtime=1&dateutc=2023-06-20+14:56:02&tempinf=73.4&humidityin=49&baromrelin=29.917&baromabsin=29.536&tempf=72.5&humidity=58&winddir=251&windspeedmph=1.12&windgustmph=2.24&maxdailygust=9.17&solarradiation=293.99&uv=2&rainratein=0.000&eventrainin=0.638&hourlyrainin=0.000&dailyrainin=0.638&weeklyrainin=0.650&monthlyrainin=0.650&yearlyrainin=0.650&totalrainin=0.650&wh65batt=0&freq=868M&model=WS2900_V2.01.18&interval=60" -X POST http://192.168.0.65:8080/report
+curl -d "PASSKEY=573AF40DB42C66057D20631F706CD585&stationtype=EasyWeatherPro_V5.1.1&runtime=1&dateutc=2023-06-20+14:56:02&tempinf=73.4&humidityin=49&baromrelin=29.917&baromabsin=29.536&tempf=72.5&humidity=58&winddir=251&windspeedmph=1.12&windgustmph=2.24&maxdailygust=9.17&solarradiation=293.99&uv=2&rainratein=0.000&eventrainin=0.638&hourlyrainin=0.000&dailyrainin=0.638&weeklyrainin=0.650&monthlyrainin=0.650&yearlyrainin=0.650&totalrainin=0.650&wh65batt=0&freq=868M&model=WS2900_V2.01.18&interval=60&lightning_num=22&lightning=20&lightning_time=1691007186" -X POST http://192.168.0.65:8080/report
 ```
 
 We can then view the corresponding Prometheus metrics with a simple GET request (output has been truncated because it is very long):
@@ -179,4 +180,16 @@ yearlyrain_mm 616.1
 # HELP totalrain_mm Total rainfall
 # TYPE totalrain_mm gauge
 totalrain_mm 616.1
+# HELP lightning_km Lightning distance
+# TYPE lightning_km gauge
+lightning_km 20.0
+# HELP lightning_num Lightning daily count
+# TYPE lightning_num gauge
+lightning_num 22.0
+```
+
+## Building and running locally
+```
+docker build -t ecowitt-exporter .
+podman run -d --rm -p 8088:8088 -e DEBUG=yes ecowitt-exporter
 ```
