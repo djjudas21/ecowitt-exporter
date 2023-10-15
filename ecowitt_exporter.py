@@ -41,6 +41,9 @@ print ('  STATION_ID:       ' + station_id)
 print ('  PROMETHEUS:       ' + str(prometheus))
 print ('  INFLUXDB:         ' + str(influxdb))
 
+# Declare metrics as a global
+metrics={}
+
 @app.route('/')
 def version():
     return "Ecowitt Exporter\n"
@@ -192,6 +195,10 @@ def logecowitt():
                 value = "{:.2f}".format(distancemi)
                 results[key] = value
 
+    # Delete wind direction if wind speed is 0
+    if results.get('windspeed') == 0:
+        del results['winddir']
+
     # Now loop on our processed results and do things with them
     points = []
     for key, value in results.items():
@@ -224,7 +231,6 @@ def logecowitt():
 if __name__ == "__main__":
 
     # Set up various Prometheus metrics with descriptions and units
-    metrics={}
     metrics['tempin'] = Gauge(name='tempin', documentation='Indoor temperature', unit=temperature_unit)
     metrics['temp'] = Gauge(name='temp', documentation='Outdoor temperature', unit=temperature_unit)
     metrics['temp1'] = Gauge(name='temp1', documentation='Temp 1', unit=temperature_unit)
