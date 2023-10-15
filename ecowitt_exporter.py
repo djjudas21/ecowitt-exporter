@@ -195,10 +195,6 @@ def logecowitt():
                 value = "{:.2f}".format(distancemi)
                 results[key] = value
 
-    # Delete wind direction if wind speed is 0
-    if results.get('windspeed') == 0:
-        del results['winddir']
-
     # Now loop on our processed results and do things with them
     points = []
     for key, value in results.items():
