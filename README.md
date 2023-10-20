@@ -44,6 +44,7 @@ for whom this will be a difficult time.
 | `RAIN_UNIT`        | `mm`                     | `mm`, `in`                         | Rainfall in millimetres or inches                                        |
 | `IRRADIANCE_UNIT`  | `wm2`                    | `wm2`, `lx`, `fc`                  | Solar irradiance in Watts/m^2                                            |
 | `DISTANCE_UNIT`    | `km`                     | `km`, `mi`                         | Distance from the last lightning in kilometers                           |
+| `AQI_STANDARD`     | `uk`                     | `uk`, `epa`, `mep`, `nepm`         | Air Quality Index standard in UK DAQI, US EPA, China MEP, Australia NEPM |
 | `INFLUXDB_TOKEN`   |                          |                                    | InfluxDB token                                                           |
 | `INFLUXDB_URL`     | `http://localhost:8086/` |                                    | InfluxDB endpoint                                                        |
 | `INFLUXDB_ORG`     | `influxdata`             |                                    | InfluxDB organisation                                                    |
@@ -94,7 +95,7 @@ Real data captured from the Ecowitt weather station with [http-webhook](https://
         "content-length": "493"
     },
     "method": "POST",
-    "body": "PASSKEY=573AF40DB42C66057D20631F706CD585&stationtype=EasyWeatherPro_V5.1.1&runtime=1&dateutc=2023-06-20+14:56:02&tempinf=73.4&humidityin=49&baromrelin=29.917&baromabsin=29.536&tempf=72.5&humidity=58&winddir=251&windspeedmph=1.12&windgustmph=2.24&maxdailygust=9.17&solarradiation=293.99&uv=2&rainratein=0.000&eventrainin=0.638&hourlyrainin=0.000&dailyrainin=0.638&weeklyrainin=0.650&monthlyrainin=0.650&yearlyrainin=0.650&totalrainin=0.650&wh65batt=0&freq=868M&model=WS2900_V2.01.18&interval=60",
+    "body": "PASSKEY=573AF40DB42C66057D20631F706CD585&stationtype=EasyWeatherPro_V5.1.1&runtime=0&dateutc=2023-10-20+11:24:35&tempinf=73.4&humidityin=57&baromrelin=28.984&baromabsin=28.603&tempf=59.2&humidity=90&winddir=256&windspeedmph=2.91&windgustmph=4.47&maxdailygust=9.17&solarradiation=96.86&uv=0&rainratein=0.000&eventrainin=1.472&hourlyrainin=0.000&dailyrainin=0.154&weeklyrainin=1.480&monthlyrainin=3.720&yearlyrainin=15.642&totalrainin=15.642&temp1f=59.5&humidity1=79&pm25_ch1=3.0&pm25_avg_24h_ch1=6.8&wh65batt=0&batt1=0&pm25batt1=5&freq=868M&model=WS2900_V2.01.18&interval=60&lightning_num=22&lightning=20&lightning_time=1691007186",
     "fresh": false,
     "hostname": "192.168.0.65",
     "ip": "::ffff:10.1.199.64",
@@ -113,7 +114,7 @@ Real data captured from the Ecowitt weather station with [http-webhook](https://
 This POST request can be simulated with curl:
 
 ```
-curl -d "PASSKEY=573AF40DB42C66057D20631F706CD585&stationtype=EasyWeatherPro_V5.1.1&runtime=1&dateutc=2023-06-20+14:56:02&tempinf=73.4&humidityin=49&baromrelin=29.917&baromabsin=29.536&tempf=72.5&humidity=58&winddir=251&windspeedmph=1.12&windgustmph=2.24&maxdailygust=9.17&solarradiation=293.99&uv=2&rainratein=0.000&eventrainin=0.638&hourlyrainin=0.000&dailyrainin=0.638&weeklyrainin=0.650&monthlyrainin=0.650&yearlyrainin=0.650&totalrainin=0.650&wh65batt=0&freq=868M&model=WS2900_V2.01.18&interval=60&lightning_num=22&lightning=20&lightning_time=1691007186" -X POST http://192.168.0.65:8080/report
+curl -d "PASSKEY=573AF40DB42C66057D20631F706CD585&stationtype=EasyWeatherPro_V5.1.1&runtime=0&dateutc=2023-10-20+11:24:35&tempinf=73.4&humidityin=57&baromrelin=28.984&baromabsin=28.603&tempf=59.2&humidity=90&winddir=256&windspeedmph=2.91&windgustmph=4.47&maxdailygust=9.17&solarradiation=96.86&uv=0&rainratein=0.000&eventrainin=1.472&hourlyrainin=0.000&dailyrainin=0.154&weeklyrainin=1.480&monthlyrainin=3.720&yearlyrainin=15.642&totalrainin=15.642&temp1f=59.5&humidity1=79&pm25_ch1=3.0&pm25_avg_24h_ch1=6.8&wh65batt=0&batt1=0&pm25batt1=5&freq=868M&model=WS2900_V2.01.18&interval=60&lightning_num=22&lightning=20&lightning_time=1691007186" -X POST http://192.168.0.65:8080/report
 ```
 
 We can then view the corresponding Prometheus metrics with a simple GET request (output has been truncated because it is very long):
