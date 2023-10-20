@@ -44,7 +44,7 @@ for whom this will be a difficult time.
 | `RAIN_UNIT`        | `mm`                     | `mm`, `in`                         | Rainfall in millimetres or inches                                        |
 | `IRRADIANCE_UNIT`  | `wm2`                    | `wm2`, `lx`, `fc`                  | Solar irradiance in Watts/m^2                                            |
 | `DISTANCE_UNIT`    | `km`                     | `km`, `mi`                         | Distance from the last lightning in kilometers                           |
-| `AQI_STANDARD`     | `uk`                     | `uk`, `epa`, `mep`                 | Air Quality Index standard in UK DAQI, US EPA AQI or China MEP AQI       |
+| `AQI_STANDARD`     | `uk`                     | `uk`, `epa`, `mep`, `nepm`         | Air Quality Index standard in UK DAQI, US EPA, China MEP, Australia NEPM |
 | `INFLUXDB_TOKEN`   |                          |                                    | InfluxDB token                                                           |
 | `INFLUXDB_URL`     | `http://localhost:8086/` |                                    | InfluxDB endpoint                                                        |
 | `INFLUXDB_ORG`     | `influxdata`             |                                    | InfluxDB organisation                                                    |

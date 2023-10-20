@@ -35,6 +35,7 @@ print ('  WIND_UNIT:        ' + wind_unit)
 print ('  RAIN_UNIT:        ' + rain_unit)
 print ('  DISTANCE_UNIT:    ' + distance_unit)
 print ('  IRRADIANCE_UNIT:  ' + irradiance_unit)
+print ('  AQI STANDARD:     ' + aqi_standard)
 print ('  INFLUXDB_TOKEN:   ' + str(influxdb_token))
 print ('  INFLUXDB_URL:     ' + influxdb_url)
 print ('  INFLUXDB_ORG:     ' + str(influxdb_org))
@@ -119,6 +120,13 @@ def aqi_uk(concentration):
         index = 9
     elif concentration > 70:
         index = 10
+    return index
+
+def aqi_nepm(concentration):
+    '''
+    Calculate the AQI using the Austration NEPM standard
+    '''
+    index = round(100 * concentration / 25)
     return index
 
 def aqi_epa(concentration):
@@ -244,8 +252,10 @@ def logecowitt():
             results['aqi'] = aqi_uk(data['pm25_avg_24h_ch1'])
         elif aqi_standard == 'epa':
             results['aqi'] = aqi_epa(data['pm25_avg_24h_ch1'])
-        elif aqi_standard == 'me[]':
+        elif aqi_standard == 'mep':
             results['aqi'] = aqi_mep(data['pm25_avg_24h_ch1'])
+        elif aqi_standard == 'nepm':
+            results['aqi'] = aqi_nepm(data['pm25_avg_24h_ch1'])
 
     # Now loop on our processed results and do things with them
     points = []
