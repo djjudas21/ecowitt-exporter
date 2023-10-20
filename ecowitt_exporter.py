@@ -100,6 +100,7 @@ def aqi_uk(concentration):
     Calculate the AQI using the UK DAQI standard
     https://en.wikipedia.org/wiki/Air_quality_index#United_Kingdom
     '''
+    concentration = float(concentration)
     if concentration < 12:
         index = 1
     elif 12 <= concentration <= 23:
@@ -126,7 +127,8 @@ def aqi_nepm(concentration):
     '''
     Calculate the AQI using the Austration NEPM standard
     '''
-    index = round(100 * concentration / 25)
+    concentration = float(concentration)
+    index = int(round(100 * concentration / 25))
     return index
 
 def aqi_epa(concentration):
