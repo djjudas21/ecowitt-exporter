@@ -1,5 +1,6 @@
 import os
 import logging
+import aqi
 from flask import Flask, request
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from prometheus_client import make_wsgi_app, Gauge
@@ -15,6 +16,7 @@ wind_unit = os.environ.get('WIND_UNIT', 'kmh')
 rain_unit = os.environ.get('RAIN_UNIT', 'mm')
 distance_unit = os.environ.get('DISTANCE_UNIT', 'km')
 irradiance_unit = os.environ.get('IRRADIANCE_UNIT', 'wm2')
+aqi_standard = os.environ.get('AQI_STANDARD', 'uk')
 influxdb_token = os.environ.get('INFLUXDB_TOKEN', None)
 influxdb_url = os.environ.get('INFLUXDB_URL', 'http://localhost:8086/')
 influxdb_org = os.environ.get('INFLUXDB_ORG', 'influxdata')
@@ -91,6 +93,47 @@ def numify(value):
         return float(value)
     else:
         return value
+    
+def aqi_uk(concentration):
+    '''
+    Calculate the AQI using the UK DAQI standard
+    https://en.wikipedia.org/wiki/Air_quality_index#United_Kingdom
+    '''
+    if concentration < 12:
+        index = 1
+    elif 12 <= concentration <= 23:
+        index = 2
+    elif 24 <= concentration <= 35:
+        index = 3
+    elif 36 <= concentration <= 41:
+        index = 4
+    elif 42 <= concentration <= 47:
+        index = 5
+    elif 48 <= concentration <= 53:
+        index = 6
+    elif 54 <= concentration <= 58:
+        index = 7
+    elif 59 <= concentration <= 64:
+        index = 8
+    elif 65 <= concentration <= 70:
+        index = 9
+    elif concentration > 70:
+        index = 10
+    return index
+
+def aqi_epa(concentration):
+    '''
+    Calculate the AQI using the US EPA standard
+    '''
+    index = aqi.to_iaqi(aqi.POLLUTANT_PM25, concentration, algo=aqi.ALGO_EPA)
+    return index
+
+def aqi_mep(concentration):
+    '''
+    Calculate the AQI using the China MEP standard
+    '''
+    index = aqi.to_iaqi(aqi.POLLUTANT_PM25, concentration, algo=aqi.ALGO_MEP)
+    return index
 
 
 @app.route('/report', methods=['POST'])
@@ -195,6 +238,15 @@ def logecowitt():
                 value = "{:.2f}".format(distancemi)
                 results[key] = value
 
+    # Add Air Quality Index (AQI)
+    if data['pm25_avg_24h_ch1']:
+        if aqi_standard == 'uk':
+            results['aqi'] = aqi_uk(data['pm25_avg_24h_ch1'])
+        elif aqi_standard == 'epa':
+            results['aqi'] = aqi_epa(data['pm25_avg_24h_ch1'])
+        elif aqi_standard == 'me[]':
+            results['aqi'] = aqi_mep(data['pm25_avg_24h_ch1'])
+
     # Now loop on our processed results and do things with them
     points = []
     for key, value in results.items():
@@ -244,6 +296,7 @@ if __name__ == "__main__":
     metrics['pm25_ch1'] = Gauge(name='pm25', documentation='PM2.5')
     metrics['pm25_avg_24h_ch1'] = Gauge(name='pm25_avg_24h', documentation='PM2.5 24-hour average')
     metrics['pm25batt1'] = Gauge(name='pm25batt', documentation='PM2.5 sensor battery')
+    metrics['aqi'] = Gauge(name='aqi', documentation='Air quality index')
     metrics['wh65batt'] = Gauge(name='wh65batt', documentation='Weather station battery status')
     metrics['solarradiation'] = Gauge(name='solarradiation', documentation='Solar irradiance', unit='wm2')
     metrics['baromrel'] = Gauge(name='baromrel', documentation='Relative barometer', unit=pressure_unit)
