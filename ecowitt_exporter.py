@@ -249,7 +249,7 @@ def logecowitt():
                 results[key] = value
 
     # Add Air Quality Index (AQI)
-    if data['pm25_avg_24h_ch1']:
+    if data.get('pm25_avg_24h_ch1'):
         if aqi_standard == 'uk':
             results['aqi'] = aqi_uk(data['pm25_avg_24h_ch1'])
         elif aqi_standard == 'epa':
