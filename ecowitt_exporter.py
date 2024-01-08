@@ -152,6 +152,13 @@ def logecowitt():
     # Retrieve the POST body
     data = request.form
 
+    # Check PM25 data from the WH41 sensor
+    # If the battery is low it gives junk readings
+    # https://github.com/djjudas21/ecowitt-exporter/issues/17
+    if data.get('pm25batt1') == 1 and data.get('pm25_ch1') == 1000:
+        # Drop erroneous reading
+        del data['pm25_ch1']
+
     # Set up a dict to receive the processed results
     results = {}
 
