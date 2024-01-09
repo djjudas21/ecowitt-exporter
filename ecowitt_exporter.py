@@ -152,13 +152,6 @@ def logecowitt():
     # Retrieve the POST body
     data = request.form
 
-    # Check PM25 data from the WH41 sensor
-    # If the battery is low it gives junk readings
-    # https://github.com/djjudas21/ecowitt-exporter/issues/17
-    if data.get('pm25batt1') == '1' and data.get('pm25_ch1') == '1000':
-        # Drop erroneous reading
-        del data['pm25_ch1']
-
     # Set up a dict to receive the processed results
     results = {}
 
@@ -265,6 +258,16 @@ def logecowitt():
             results['aqi'] = aqi_mep(data['pm25_avg_24h_ch1'])
         elif aqi_standard == 'nepm':
             results['aqi'] = aqi_nepm(data['pm25_avg_24h_ch1'])
+
+    # Check data from the WH41 PM2.5 sensor
+    # If the battery is low it gives junk readings
+    # https://github.com/djjudas21/ecowitt-exporter/issues/17
+    if data.get('pm25batt1') == '1' and data.get('pm25_ch1') == '1000':
+        # Drop erroneous readings
+        app.logger.debug("Drop erroneous PM25 reading 'pm25_ch1': %s", results['pm25_ch1'])
+        del results['pm25_ch1']
+        del results['pm25_avg_24h_ch1']
+        del results['aqi']
 
     # Now loop on our processed results and do things with them
     points = []
