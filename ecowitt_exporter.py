@@ -103,24 +103,26 @@ def aqi_uk(concentration):
     concentration = float(concentration)
     if concentration < 12:
         index = 1
-    elif 12 <= concentration <= 23:
+    elif 12 <= concentration < 24:
         index = 2
-    elif 24 <= concentration <= 35:
+    elif 24 <= concentration < 36:
         index = 3
-    elif 36 <= concentration <= 41:
+    elif 36 <= concentration < 42:
         index = 4
-    elif 42 <= concentration <= 47:
+    elif 42 <= concentration < 48:
         index = 5
-    elif 48 <= concentration <= 53:
+    elif 48 <= concentration < 54:
         index = 6
-    elif 54 <= concentration <= 58:
+    elif 54 <= concentration < 59:
         index = 7
-    elif 59 <= concentration <= 64:
+    elif 59 <= concentration < 65:
         index = 8
-    elif 65 <= concentration <= 70:
+    elif 65 <= concentration < 71:
         index = 9
-    elif concentration > 70:
+    elif concentration >= 71:
         index = 10
+    else:
+        index = None
     return index
 
 def aqi_nepm(concentration):
