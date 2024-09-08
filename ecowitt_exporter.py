@@ -243,6 +243,7 @@ def logecowitt():
             results[key] = value
         
         # Support for WS90 with a haptic rain sensor
+        # pylint: disable=consider-iterating-dictionary
         if key in rainmaps.keys():
             if rain_unit == 'mm':
                 # Convert inches to mm
@@ -253,13 +254,13 @@ def logecowitt():
 
         # Support for WS90 capacitor
         if key in ['ws90cap_volt']:
-            if  not 'capacitor' in metrics:
+            if 'capacitor' not in metrics:
                 metrics['capacitor'] = Gauge(name='capacitor', documentation='electrical energy storedin the capacitor in volts', unit="volt")
             results['capacitor'] = value
 
         # Support for WS90 battery
         if key in ['wh90batt']:
-            if  not 'battery' in metrics:
+            if 'battery' not in metrics:
                 metrics['battery'] = Gauge(name='wh90batt', documentation='electrical energy stored in the battery in volts', unit="volt")
             results['battery'] = value
 
