@@ -147,6 +147,17 @@ def aqi_mep(concentration):
     index = aqi.to_iaqi(aqi.POLLUTANT_PM25, concentration, algo=aqi.ALGO_MEP)
     return index
 
+# Support for WS90 with a haptic rain sensor
+rainmaps = {
+        "rrain_piezo": "rainrate",
+        "erain_piezo": "eventrain",
+        "hrain_piezo": "hourlyrain",
+        "drain_piezo": "dailyrain",
+        "wrain_piezo": "weeklyrain",
+        "mrain_piezo": "monthlyrain",
+        "yrain_piezo": "yearlyrain"
+}
+
 
 @app.route('/report', methods=['POST'])
 def logecowitt():
@@ -230,6 +241,27 @@ def logecowitt():
             if key != 'maxdailygust':
                 key = key[:-3]
             results[key] = value
+        
+        # Support for WS90 with a haptic rain sensor
+        if key in rainmaps.keys():
+            if rain_unit == 'mm':
+                # Convert inches to mm
+                rainmm = float(value) * 25.4
+                value = "{:.1f}".format(rainmm)
+            mkey = rainmaps[key]
+            results[mkey] = value
+
+        # Support for WS90 capacitor
+        if key in ['ws90cap_volt']:
+            if  not 'capacitor' in metrics:
+                metrics['capacitor'] = Gauge(name='capacitor', documentation='electrical energy storedin the capacitor in volts', unit="volt")
+            results['capacitor'] = value
+
+        # Support for WS90 battery
+        if key in ['wh90batt']:
+            if  not 'battery' in metrics:
+                metrics['battery'] = Gauge(name='wh90batt', documentation='electrical energy stored in the battery in volts', unit="volt")
+            results['battery'] = value
 
         # Rainfall, default inches
         if key in ['rainratein', 'eventrainin', 'hourlyrainin', 'dailyrainin', 'weeklyrainin', 'monthlyrainin', 'yearlyrainin', 'totalrainin']:
