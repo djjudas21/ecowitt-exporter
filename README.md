@@ -14,6 +14,27 @@ This exporter runs on a single HTTP port (default `8088`) and provides two endpo
 * `/report` where the Ecowitt weather station should POST its data
 * `/metrics` where Prometheus can scrape metrics with a GET request
 
+## Supported hardware
+
+Most Ecowitt weather stations and sensors should work fine with this exporter.
+The following hardware has been explicitly tested. If you have info about any hardware
+that does or doesn't work, please raise an issue so I can update the list.
+
+### Weather stations
+
+- WS2910 Weather Station
+- GW1100 Wi-Fi Gateway
+
+### Sensors
+
+- WS69 Wireless 7-in-1 Outdoor Sensor Array
+- WS90 7-in-1 Outdoor Anti-vibration Haptic Sensor Array
+- WH41/WH43 PM2.5 Air Quality Sensor
+- WH57 Outdoor Lightning Sensor
+- WN31/WH31 Multi-Channel Temperature & Humidity Sensor
+- WN32/WH32 Single-Channel Temperature & Humidity Sensor
+- WN36 Floating Pool Temperature Sensor
+
 ## Note about Ecowitt firmware
 
 It seems that an Ecowitt WS2910 with firmware v5.1.1 has a bug when writing out HTTP headers, which causes it to not work with Flask.
