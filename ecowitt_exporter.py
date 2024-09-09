@@ -211,7 +211,7 @@ def logecowitt():
         if key in ['baromrelin', 'baromabsin']:
             if pressure_unit == 'hpa':
                 # Convert inches Hg to hPa
-                pressurehpa = float(value) * 33.6585
+                pressurehpa = float(value) * 33.8639
                 value = "{:.2f}".format(pressurehpa)
             if pressure_unit == 'mmhg':
                 # Convert inches Hg to mmHg
