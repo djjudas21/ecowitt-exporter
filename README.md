@@ -212,6 +212,6 @@ lightning_num 22.0
 
 ## Building and running locally
 ```
-docker build -t ecowitt-exporter .
+podman build -t ecowitt-exporter .
 podman run -d --rm -p 8088:8088 -e DEBUG=yes ecowitt-exporter
 ```
