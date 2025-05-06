@@ -175,11 +175,11 @@ def logecowitt():
         app.logger.debug("Received raw value %s: %s", key, value)
 
         # Ignore these fields
-        if key in ['PASSKEY', 'stationtype', 'dateutc', 'wh25batt', 'batt1', 'batt2', 'freq', 'model', 'runtime']:
+        if key in ['PASSKEY', 'stationtype', 'dateutc', 'freq', 'model', 'runtime']:
             continue
 
         # No conversions needed
-        if key in ['humidity', 'humidityin', 'winddir', 'uv', 'pm25_ch1', 'pm25_avg_24h_ch1', 'pm25batt1', 'wh65batt', 'lightning_num']:
+        if key in ['humidity', 'humidityin', 'winddir', 'uv', 'pm25_ch1', 'pm25_avg_24h_ch1', 'pm25batt1', 'wh65batt', 'wh57batt', 'wh25batt', 'batt1', 'batt2', 'batt3', 'batt4', 'batt5', 'batt6', 'batt7', 'batt8','lightning_num']:
             results[key] = value
 
         # Solar irradiance, default W/m^2
@@ -338,14 +338,14 @@ if __name__ == "__main__":
     # Set up various Prometheus metrics with descriptions and units
     metrics['tempin'] = Gauge(name='tempin', documentation='Indoor temperature', unit=temperature_unit)
     metrics['temp'] = Gauge(name='temp', documentation='Outdoor temperature', unit=temperature_unit)
-    metrics['temp1'] = Gauge(name='temp1', documentation='Temp 1', unit=temperature_unit)
-    metrics['temp2'] = Gauge(name='temp2', documentation='Temp 2', unit=temperature_unit)
-    metrics['temp3'] = Gauge(name='temp3', documentation='Temp 3', unit=temperature_unit)
-    metrics['temp4'] = Gauge(name='temp4', documentation='Temp 4', unit=temperature_unit)
-    metrics['temp5'] = Gauge(name='temp5', documentation='Temp 5', unit=temperature_unit)
-    metrics['temp6'] = Gauge(name='temp6', documentation='Temp 6', unit=temperature_unit)
-    metrics['temp7'] = Gauge(name='temp7', documentation='Temp 7', unit=temperature_unit)
-    metrics['temp8'] = Gauge(name='temp8', documentation='Temp 8', unit=temperature_unit)
+    metrics['temp1'] = Gauge(name='temp1', documentation='Temperature sensor 1', unit=temperature_unit)
+    metrics['temp2'] = Gauge(name='temp2', documentation='Temperature sensor 2', unit=temperature_unit)
+    metrics['temp3'] = Gauge(name='temp3', documentation='Temperature sensor 3', unit=temperature_unit)
+    metrics['temp4'] = Gauge(name='temp4', documentation='Temperature sensor 4', unit=temperature_unit)
+    metrics['temp5'] = Gauge(name='temp5', documentation='Temperature sensor 5', unit=temperature_unit)
+    metrics['temp6'] = Gauge(name='temp6', documentation='Temperature sensor 6', unit=temperature_unit)
+    metrics['temp7'] = Gauge(name='temp7', documentation='Temperature sensor 7', unit=temperature_unit)
+    metrics['temp8'] = Gauge(name='temp8', documentation='Temperature sensor 8', unit=temperature_unit)
     metrics['humidity'] = Gauge(name='humidity', documentation='Outdoor humidity', unit='percent')
     metrics['humidityin'] = Gauge(name='humidityin', documentation='Indoor humidity', unit='percent')
     metrics['winddir'] = Gauge(name='winddir', documentation='Wind direction', unit='degree')
@@ -354,7 +354,17 @@ if __name__ == "__main__":
     metrics['pm25_avg_24h_ch1'] = Gauge(name='pm25_avg_24h', documentation='PM2.5 24-hour average')
     metrics['pm25batt1'] = Gauge(name='pm25batt', documentation='PM2.5 sensor battery')
     metrics['aqi'] = Gauge(name='aqi', documentation='Air quality index')
+    metrics['wh25batt'] = Gauge(name='wh25batt', documentation='Weather station battery status')
     metrics['wh65batt'] = Gauge(name='wh65batt', documentation='Weather station battery status')
+    metrics['wh57batt'] = Gauge(name='wh57batt', documentation='Lightning detector battery')
+    metrics['batt1'] = Gauge(name='batt1', documentation='Temperature sensor 1 battery status')
+    metrics['batt2'] = Gauge(name='batt2', documentation='Temperature sensor 2 battery status')
+    metrics['batt3'] = Gauge(name='batt3', documentation='Temperature sensor 3 battery status')
+    metrics['batt4'] = Gauge(name='batt4', documentation='Temperature sensor 4 battery status')
+    metrics['batt5'] = Gauge(name='batt5', documentation='Temperature sensor 5 battery status')
+    metrics['batt6'] = Gauge(name='batt6', documentation='Temperature sensor 6 battery status')
+    metrics['batt7'] = Gauge(name='batt7', documentation='Temperature sensor 7 battery status')
+    metrics['batt8'] = Gauge(name='batt8', documentation='Temperature sensor 8 battery status')
     metrics['solarradiation'] = Gauge(name='solarradiation', documentation='Solar irradiance', unit='wm2')
     metrics['baromrel'] = Gauge(name='baromrel', documentation='Relative barometer', unit=pressure_unit)
     metrics['baromabs'] = Gauge(name='baromabs', documentation='Absolute barometer', unit=pressure_unit)
