@@ -208,7 +208,7 @@ def logecowitt():
             results[key] = value
 
         # Pressure, default inches Hg
-        if key in ['baromrelin', 'baromabsin']:
+        if key in ['baromrelin', 'baromabsin', 'vpd']:
             if pressure_unit == 'hpa':
                 # Convert inches Hg to hPa
                 pressurehpa = float(value) * 33.8639
@@ -368,6 +368,7 @@ if __name__ == "__main__":
     metrics['solarradiation'] = Gauge(name='solarradiation', documentation='Solar irradiance', unit='wm2')
     metrics['baromrel'] = Gauge(name='baromrel', documentation='Relative barometer', unit=pressure_unit)
     metrics['baromabs'] = Gauge(name='baromabs', documentation='Absolute barometer', unit=pressure_unit)
+    metrics['vpd'] = Gauge(name='vpd', documentation='Vapour pressure deficit', unit=pressure_unit)
     metrics['windspeed'] = Gauge(name='windspeed', documentation='Wind speed', unit=wind_unit)
     metrics['windgust'] = Gauge(name='windgust', documentation='Wind gust', unit=wind_unit)
     metrics['maxdailygust'] = Gauge(name='maxdailygust', documentation='Max daily gust', unit=wind_unit)
