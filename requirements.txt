@@ -1,5 +1,5 @@
-flask==2.3.2
-werkzeug==2.3.6
-prometheus_client==0.17.0
+flask==2.3.3
+werkzeug==2.3.8
+prometheus_client==0.21.1
 influxdb-client==1.36.1
 python-aqi==0.6.1
