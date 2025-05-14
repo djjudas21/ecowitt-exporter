@@ -295,6 +295,16 @@ def logecowitt():
         elif aqi_standard == 'nepm':
             results['aqi'] = aqi_nepm(data['pm25_avg_24h_ch1'])
 
+    if data.get('pm25_avg_24h_ch2'):
+        if aqi_standard == 'uk':
+            results['aqi'] = aqi_uk(data['pm25_avg_24h_ch2'])
+        elif aqi_standard == 'epa':
+            results['aqi'] = aqi_epa(data['pm25_avg_24h_ch2'])
+        elif aqi_standard == 'mep':
+            results['aqi'] = aqi_mep(data['pm25_avg_24h_ch2'])
+        elif aqi_standard == 'nepm':
+            results['aqi'] = aqi_nepm(data['pm25_avg_24h_ch2'])
+
     # Check data from the WH41 PM2.5 sensor
     # If the battery is low it gives junk readings
     # https://github.com/djjudas21/ecowitt-exporter/issues/17
@@ -303,6 +313,12 @@ def logecowitt():
         app.logger.debug("Drop erroneous PM25 reading 'pm25_ch1': %s", results['pm25_ch1'])
         del results['pm25_ch1']
         del results['pm25_avg_24h_ch1']
+        del results['aqi']
+    if data.get('pm25batt2') == '1' and data.get('pm25_ch2') == '1000':
+        # Drop erroneous readings
+        app.logger.debug("Drop erroneous PM25 reading 'pm25_ch2': %s", results['pm25_ch2'])
+        del results['pm25_ch2']
+        del results['pm25_avg_24h_ch2']
         del results['aqi']
 
     # Now loop on our processed results and do things with them
@@ -351,9 +367,12 @@ if __name__ == "__main__":
     metrics['humidityin'] = Gauge(name='humidityin', documentation='Indoor humidity', unit='percent')
     metrics['winddir'] = Gauge(name='winddir', documentation='Wind direction', unit='degree')
     metrics['uv'] = Gauge(name='uv', documentation='UV index')
-    metrics['pm25_ch1'] = Gauge(name='pm25', documentation='PM2.5')
-    metrics['pm25_avg_24h_ch1'] = Gauge(name='pm25_avg_24h', documentation='PM2.5 24-hour average')
-    metrics['pm25batt1'] = Gauge(name='pm25batt', documentation='PM2.5 sensor battery')
+    metrics['pm25_ch1'] = Gauge(name='pm25_ch1', documentation='PM2.5')
+    metrics['pm25_avg_24h_ch1'] = Gauge(name='pm25_avg_24h_ch1', documentation='PM2.5 24-hour average')
+    metrics['pm25batt1'] = Gauge(name='pm25batt1', documentation='PM2.5 sensor battery')
+    metrics['pm25_ch2'] = Gauge(name='pm25_ch2', documentation='PM2.5')
+    metrics['pm25_avg_24h_ch2'] = Gauge(name='pm25_avg_24h_ch2', documentation='PM2.5 24-hour average')
+    metrics['pm25batt2'] = Gauge(name='pm25batt2', documentation='PM2.5 sensor battery')
     metrics['aqi'] = Gauge(name='aqi', documentation='Air quality index')
     metrics['wh25batt'] = Gauge(name='wh25batt', documentation='Weather station battery status')
     metrics['wh65batt'] = Gauge(name='wh65batt', documentation='Weather station battery status')
