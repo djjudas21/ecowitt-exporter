@@ -217,7 +217,8 @@ def logecowitt():
                 # Convert inches Hg to mmHg
                 pressuremmhg = float(value) * 25.4
                 value = "{:.2f}".format(pressuremmhg)
-            key = key[:-2]
+            if key != 'vpd':
+                key = key[:-2]
             results[key] = value
 
         # Wind speed, default mph
