@@ -4,8 +4,6 @@ import aqi
 from flask import Flask, request
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from prometheus_client import make_wsgi_app, Gauge
-from influxdb_client import InfluxDBClient, Point
-from influxdb_client.client.write_api import SYNCHRONOUS
 
 app = Flask(__name__)
 
@@ -17,13 +15,7 @@ rain_unit = os.environ.get('RAIN_UNIT', 'mm')
 distance_unit = os.environ.get('DISTANCE_UNIT', 'km')
 irradiance_unit = os.environ.get('IRRADIANCE_UNIT', 'wm2')
 aqi_standard = os.environ.get('AQI_STANDARD', 'uk')
-influxdb_token = os.environ.get('INFLUXDB_TOKEN', None)
-influxdb_url = os.environ.get('INFLUXDB_URL', 'http://localhost:8086/')
-influxdb_org = os.environ.get('INFLUXDB_ORG', 'influxdata')
-influxdb_bucket = os.environ.get('INFLUXDB_BUCKET', 'default')
 station_id = os.environ.get('STATION_ID', 'ecowitt')
-prometheus = os.environ.get('PROMETHEUS', 'yes') == 'yes'
-influxdb = os.environ.get('INFLUXDB', 'no') == 'yes'
 
 print ("Ecowitt Exporter")
 print ("================")
@@ -36,13 +28,7 @@ print ('  RAIN_UNIT:        ' + rain_unit)
 print ('  DISTANCE_UNIT:    ' + distance_unit)
 print ('  IRRADIANCE_UNIT:  ' + irradiance_unit)
 print ('  AQI STANDARD:     ' + aqi_standard)
-print ('  INFLUXDB_TOKEN:   ' + str(influxdb_token))
-print ('  INFLUXDB_URL:     ' + influxdb_url)
-print ('  INFLUXDB_ORG:     ' + str(influxdb_org))
-print ('  INFLUXDB_BUCKET:  ' + influxdb_bucket)
 print ('  STATION_ID:       ' + station_id)
-print ('  PROMETHEUS:       ' + str(prometheus))
-print ('  INFLUXDB:         ' + str(influxdb))
 
 # Declare metrics as a global
 metrics={}
@@ -325,22 +311,8 @@ def logecowitt():
     points = []
     for key, value in results.items():
         # Send the data to the Prometheus exporter
-        if prometheus:
-            metrics[key].set(value)
-            app.logger.debug("Set Prometheus metric %s: %s", key, value)
-
-        # Build an array of points to send to InfluxDB
-        if influxdb:
-            point = Point("weather").tag("station_id", station_id).field(key, numify(value))
-            app.logger.debug("Created InfluxDB point %s: %s", key, value)
-            points.append(point)
-
-    # Send the data to InfluxDB
-    if influxdb:
-        with InfluxDBClient(url=influxdb_url, token=influxdb_token, org=influxdb_org) as client:
-            write_api = client.write_api(write_options=SYNCHRONOUS)
-            write_api.write(bucket=influxdb_bucket, record=points)
-            app.logger.debug("Submitted InfluxDB points to server")
+        metrics[key].set(value)
+        app.logger.debug("Set Prometheus metric %s: %s", key, value)
 
     # Return a 200 to the weather station
     response = app.response_class(
@@ -408,8 +380,7 @@ if __name__ == "__main__":
         app.logger.setLevel(logging.DEBUG)
 
     # Add prometheus wsgi middleware to route /metrics requests
-    if prometheus:
-        app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
-            '/metrics': make_wsgi_app()
-        })
+    app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
+        '/metrics': make_wsgi_app()
+    })
     app.run(host="0.0.0.0", port=8088, debug=debug)
