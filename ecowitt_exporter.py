@@ -166,8 +166,10 @@ def logecowitt():
 
         # No conversions needed
         if key in ['winddir', 'uv', 'lightning_num']:
-            results[key] = value
-        
+        # Support for WS90 capacitor
+        if key in ['ws90cap_volt', 'ws90batt']:
+            metrics['ws90'].labels(key).set(value)
+
         # Battery status & levels
         if 'batt' in key:
             # Battery level - returns battery level from 0-5
@@ -290,17 +292,6 @@ def logecowitt():
             mkey = rainmaps[key]
             results[mkey] = value
 
-        # Support for WS90 capacitor
-        if key in ['ws90cap_volt']:
-            if 'capacitor' not in metrics:
-                metrics['capacitor'] = Gauge(name='capacitor', documentation='electrical energy storedin the capacitor in volts', unit="volt")
-            results['capacitor'] = value
-
-        # Support for WS90 battery
-        if key in ['wh90batt']:
-            if 'battery' not in metrics:
-                metrics['battery'] = Gauge(name='wh90batt', documentation='electrical energy stored in the battery in volts', unit="volt")
-            results['battery'] = value
 
         # Rainfall, default inches
         if 'rain' in key:
@@ -393,6 +384,7 @@ if __name__ == "__main__":
     metrics['rain'] = Gauge(name='rain', documentation='Rainfall', unit=rain_unit, labelnames=['sensor'])
     metrics['lightning'] = Gauge(name='lightning', documentation='Lightning distance', unit=distance_unit)
     metrics['lightning_num'] = Gauge(name='lightning_num', documentation='Lightning daily count')
+    metrics['ws90'] = Gauge(name='wh90', documentation='WS90 electrical energy stored', unit='volt', labelnames=['sensor'])
 
     # Increase Flask logging if in debug mode
     if debug:
