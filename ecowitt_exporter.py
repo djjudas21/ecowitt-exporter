@@ -255,7 +255,7 @@ def logecowitt():
                 value = "{:.2f}".format(speedfps)
             if key != 'maxdailygust':
                 key = key[:-3]
-            results[key] = value
+            metrics['wind'].labels(key).set(value)
         
         # Support for WS90 with a haptic rain sensor
         # pylint: disable=consider-iterating-dictionary
@@ -368,9 +368,7 @@ if __name__ == "__main__":
     metrics['baromrel'] = Gauge(name='baromrel', documentation='Relative barometer', unit=pressure_unit)
     metrics['baromabs'] = Gauge(name='baromabs', documentation='Absolute barometer', unit=pressure_unit)
     metrics['vpd'] = Gauge(name='vpd', documentation='Vapour pressure deficit', unit=pressure_unit)
-    metrics['windspeed'] = Gauge(name='windspeed', documentation='Wind speed', unit=wind_unit)
-    metrics['windgust'] = Gauge(name='windgust', documentation='Wind gust', unit=wind_unit)
-    metrics['maxdailygust'] = Gauge(name='maxdailygust', documentation='Max daily gust', unit=wind_unit)
+    metrics['wind'] = Gauge(name='windspeed', documentation='Wind speed', unit=wind_unit, labelnames=['sensor'])
     metrics['rainrate'] = Gauge(name='rainrate', documentation='Rainfall rate', unit=rain_unit)
     metrics['eventrain'] = Gauge(name='eventrain', documentation='Event rainfall', unit=rain_unit)
     metrics['hourlyrain'] = Gauge(name='hourlyrain', documentation='Hourly rainfall', unit=rain_unit)
