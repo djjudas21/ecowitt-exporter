@@ -3,7 +3,7 @@ import os
 import logging
 from flask import Flask, request
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
-from prometheus_client import make_wsgi_app, Gauge
+from prometheus_client import make_wsgi_app, Gauge, Info
 
 app = Flask(__name__)
 
@@ -112,8 +112,12 @@ def logecowitt():
         app.logger.debug("Received raw value %s: %s", key, value)
 
         # Ignore these fields
-        if key in ['PASSKEY', 'stationtype', 'dateutc', 'freq', 'model', 'runtime']:
+        if key in ['PASSKEY', 'dateutc', 'runtime']:
             continue
+        
+        # Add these fields as INFO
+        if key in ['stationtype', 'freq', 'model']:
+            metrics[key].info({key: value})
 
         # No conversions needed
         if key in ['winddir', 'uv', 'lightning_num']:
@@ -292,6 +296,9 @@ def logecowitt():
 if __name__ == "__main__":
 
     # Set up various Prometheus metrics with descriptions and units
+    metrics['stationtype'] = Info(name=prefix+'stationtype', documentation='Ecowitt station type')
+    metrics['freq'] = Info(name=prefix+'freq', documentation='Ecowitt radio frequency')
+    metrics['model'] = Info(name=prefix+'model', documentation='Ecowitt model')
     metrics['temp'] = Gauge(name=prefix+'temp', documentation='Temperature', unit=temperature_unit, labelnames=['sensor'])
     metrics['humidity'] = Gauge(name=prefix+'humidity', documentation='Relative humidity', unit='percent', labelnames=['sensor'])
     metrics['winddir'] = Gauge(name=prefix+'winddir', documentation='Wind direction', unit='degree')
