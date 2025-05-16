@@ -116,19 +116,19 @@ def logecowitt():
             continue
         
         # Add these fields as INFO
-        if key in ['stationtype', 'freq', 'model']:
+        elif key in ['stationtype', 'freq', 'model']:
             metrics[key].info({key: value})
 
         # No conversions needed
-        if key in ['winddir', 'uv', 'lightning_num']:
+        elif key in ['winddir', 'uv', 'lightning_num']:
             metrics[key].set(value)
         
         # Support for WS90 capacitor
-        if key in ['ws90cap_volt', 'ws90batt']:
+        elif key in ['ws90cap_volt', 'ws90batt']:
             metrics['ws90'].labels(key).set(value)
 
         # Battery status & levels
-        if 'batt' in key:
+        elif 'batt' in key:
             # Battery level - returns battery level from 0-5
             if key in ['wh57batt', 'pm25batt1', 'pm25batt2']:
                 metrics['batterylevel'].labels(key).set(value)
@@ -138,12 +138,12 @@ def logecowitt():
 
         # PM25
         # 'pm25_ch1', 'pm25_avg_24h_ch1'
-        if key.startswith('pm25'):
+        elif key.startswith('pm25'):
             key = key.replace('pm25_', '')
             metrics['pm25'].labels(key).set(value)
 
         # Humidity - no conversion needed
-        if key.startswith('humidity'):
+        elif key.startswith('humidity'):
             if key == 'humidity':
                 label = 'outdoor'
             elif key == 'humidityin':
@@ -151,7 +151,7 @@ def logecowitt():
             metrics['humidity'].labels(label).set(value)
 
         # Solar irradiance, default W/m^2
-        if key in ['solarradiation']:
+        elif key in ['solarradiation']:
             if irradiance_unit == 'lx':
                 value = wm22lux(value)
             elif irradiance_unit == 'fc':
@@ -160,7 +160,7 @@ def logecowitt():
 
         # Temperature, default Fahrenheit
         # 'tempinf', 'tempf', 'temp1f', 'temp2f', 'temp3f', 'temp4f', 'temp5f', 'temp6f', 'temp7f', 'temp8f'
-        if key.startswith('temp'):
+        elif key.startswith('temp'):
             # Strip trailing f
             key = key[:-1]
 
@@ -179,7 +179,7 @@ def logecowitt():
             metrics['temp'].labels(label).set(value)
 
         # Pressure, default inches Hg
-        if key.startswith('barom'):
+        elif key.startswith('barom'):
             if pressure_unit == 'hpa':
                 value = inhg2hpa(value)
             if pressure_unit == 'mmhg':
@@ -194,7 +194,7 @@ def logecowitt():
             metrics['barom'].labels(label).set(value)
 
         # VPD, default inches Hg
-        if key in ['vpd']:
+        elif key in ['vpd']:
             if pressure_unit == 'hpa':
                 value = inhg2hpa(value)
             if pressure_unit == 'mmhg':
@@ -203,7 +203,7 @@ def logecowitt():
             metrics['vpd'].set(value)
 
         # Wind speed, default mph
-        if key in ['windspeedmph', 'windgustmph', 'maxdailygust']:
+        elif key in ['windspeedmph', 'windgustmph', 'maxdailygust']:
             if wind_unit == 'kmh':
                 value = mph2kmh(value)
             elif wind_unit == 'ms':
@@ -218,14 +218,14 @@ def logecowitt():
         
         # Support for WS90 with a haptic rain sensor
         # pylint: disable=consider-iterating-dictionary
-        if key in rainmaps.keys():
+        elif key in rainmaps.keys():
             if rain_unit == 'mm':
                 value = in2mm(value)
             mkey = rainmaps[key]
             metrics[mkey].set(value)
 
         # Rainfall, default inches
-        if 'rain' in key:
+        elif 'rain' in key:
         # 'rainratein', 'eventrainin', 'hourlyrainin', 'dailyrainin', 'weeklyrainin', 'monthlyrainin', 'yearlyrainin', 'totalrainin'
             if rain_unit == 'mm':
                 value = in2mm(value)
@@ -234,7 +234,7 @@ def logecowitt():
             metrics['rain'].labels(key).set(value)
 
         # Lightning distance, default kilometers
-        if key in ['lightning']:
+        elif key in ['lightning']:
             if distance_unit == 'km':
                 metrics[key].set(value)
             elif distance_unit == 'mi':
