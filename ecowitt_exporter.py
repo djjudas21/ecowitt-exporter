@@ -167,6 +167,16 @@ def logecowitt():
         # No conversions needed
         if key in ['winddir', 'uv', 'pm25_ch1', 'pm25_avg_24h_ch1', 'lightning_num']:
             results[key] = value
+        
+        # Battery status & levels
+        if 'batt' in key:
+            # Battery level - returns battery level from 0-5
+            if key in ['wh57batt', 'pm25batt1', 'pm25batt2']:
+                metrics['batterylevel'].labels(key).set(value)
+            # Battery status - returns 0 for OK and 1 for low
+            else:
+                metrics['batterystatus'].labels(key).set(value)
+
         # Humidity - no conversion needed
         if key.startswith('humidity'):
             if key == 'humidity':
@@ -349,22 +359,11 @@ if __name__ == "__main__":
     metrics['uv'] = Gauge(name='uv', documentation='UV index')
     metrics['pm25_ch1'] = Gauge(name='pm25_ch1', documentation='PM2.5')
     metrics['pm25_avg_24h_ch1'] = Gauge(name='pm25_avg_24h_ch1', documentation='PM2.5 24-hour average')
-    metrics['pm25batt1'] = Gauge(name='pm25batt1', documentation='PM2.5 sensor battery')
     metrics['pm25_ch2'] = Gauge(name='pm25_ch2', documentation='PM2.5')
     metrics['pm25_avg_24h_ch2'] = Gauge(name='pm25_avg_24h_ch2', documentation='PM2.5 24-hour average')
-    metrics['pm25batt2'] = Gauge(name='pm25batt2', documentation='PM2.5 sensor battery')
     metrics['aqi'] = Gauge(name='aqi', documentation='Air quality index')
-    metrics['wh25batt'] = Gauge(name='wh25batt', documentation='Weather station battery status')
-    metrics['wh65batt'] = Gauge(name='wh65batt', documentation='Weather station battery status')
-    metrics['wh57batt'] = Gauge(name='wh57batt', documentation='Lightning detector battery')
-    metrics['batt1'] = Gauge(name='batt1', documentation='Temperature sensor 1 battery status')
-    metrics['batt2'] = Gauge(name='batt2', documentation='Temperature sensor 2 battery status')
-    metrics['batt3'] = Gauge(name='batt3', documentation='Temperature sensor 3 battery status')
-    metrics['batt4'] = Gauge(name='batt4', documentation='Temperature sensor 4 battery status')
-    metrics['batt5'] = Gauge(name='batt5', documentation='Temperature sensor 5 battery status')
-    metrics['batt6'] = Gauge(name='batt6', documentation='Temperature sensor 6 battery status')
-    metrics['batt7'] = Gauge(name='batt7', documentation='Temperature sensor 7 battery status')
-    metrics['batt8'] = Gauge(name='batt8', documentation='Temperature sensor 8 battery status')
+    metrics['batterystatus'] = Gauge(name='batterystatus', documentation='Battery status', labelnames=['sensor'])
+    metrics['batterylevel'] = Gauge(name='batterylevel', documentation='Battery level', labelnames=['sensor'])
     metrics['solarradiation'] = Gauge(name='solarradiation', documentation='Solar irradiance', unit='wm2')
     metrics['baromrel'] = Gauge(name='baromrel', documentation='Relative barometer', unit=pressure_unit)
     metrics['baromabs'] = Gauge(name='baromabs', documentation='Absolute barometer', unit=pressure_unit)
