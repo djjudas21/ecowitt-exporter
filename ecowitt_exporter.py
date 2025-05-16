@@ -165,8 +165,15 @@ def logecowitt():
             continue
 
         # No conversions needed
-        if key in ['humidity', 'humidityin', 'winddir', 'uv', 'pm25_ch1', 'pm25_avg_24h_ch1', 'pm25batt1', 'wh65batt', 'wh57batt', 'wh25batt', 'batt1', 'batt2', 'batt3', 'batt4', 'batt5', 'batt6', 'batt7', 'batt8','lightning_num']:
+        if key in ['winddir', 'uv', 'pm25_ch1', 'pm25_avg_24h_ch1', 'lightning_num']:
             results[key] = value
+        # Humidity - no conversion needed
+        if key.startswith('humidity'):
+            if key == 'humidity':
+                label = 'outdoor'
+            elif key == 'humidityin':
+                label = 'indoor'
+            metrics['humidity'].labels(label).set(value)
 
         # Solar irradiance, default W/m^2
         if key in ['solarradiation']:
@@ -337,18 +344,7 @@ if __name__ == "__main__":
 
     # Set up various Prometheus metrics with descriptions and units
     metrics['temp'] = Gauge(name='temp', documentation='Temperature', unit=temperature_unit, labelnames=['sensor'])
-    metrics['tempin'] = Gauge(name='tempin', documentation='Indoor temperature', unit=temperature_unit)
-    metrics['temp'] = Gauge(name='temp', documentation='Outdoor temperature', unit=temperature_unit)
-    metrics['temp1'] = Gauge(name='temp1', documentation='Temperature sensor 1', unit=temperature_unit)
-    metrics['temp2'] = Gauge(name='temp2', documentation='Temperature sensor 2', unit=temperature_unit)
-    metrics['temp3'] = Gauge(name='temp3', documentation='Temperature sensor 3', unit=temperature_unit)
-    metrics['temp4'] = Gauge(name='temp4', documentation='Temperature sensor 4', unit=temperature_unit)
-    metrics['temp5'] = Gauge(name='temp5', documentation='Temperature sensor 5', unit=temperature_unit)
-    metrics['temp6'] = Gauge(name='temp6', documentation='Temperature sensor 6', unit=temperature_unit)
-    metrics['temp7'] = Gauge(name='temp7', documentation='Temperature sensor 7', unit=temperature_unit)
-    metrics['temp8'] = Gauge(name='temp8', documentation='Temperature sensor 8', unit=temperature_unit)
-    metrics['humidity'] = Gauge(name='humidity', documentation='Outdoor humidity', unit='percent')
-    metrics['humidityin'] = Gauge(name='humidityin', documentation='Indoor humidity', unit='percent')
+    metrics['humidity'] = Gauge(name='humidity', documentation='Relative humidity', unit='percent', labelnames=['sensor'])
     metrics['winddir'] = Gauge(name='winddir', documentation='Wind direction', unit='degree')
     metrics['uv'] = Gauge(name='uv', documentation='UV index')
     metrics['pm25_ch1'] = Gauge(name='pm25_ch1', documentation='PM2.5')
