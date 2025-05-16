@@ -181,7 +181,11 @@ def logecowitt():
             results[key] = value
 
         # Temperature, default Fahrenheit
-        if key in ['tempinf', 'tempf', 'temp1f', 'temp2f', 'temp3f', 'temp4f', 'temp5f', 'temp6f', 'temp7f', 'temp8f']:
+        # 'tempinf', 'tempf', 'temp1f', 'temp2f', 'temp3f', 'temp4f', 'temp5f', 'temp6f', 'temp7f', 'temp8f'
+        if key.startswith('temp'):
+            # Strip trailing f
+            key = key[:-1]
+
             if temperature_unit == 'c':
                 # Convert degrees Fahrenheit to Celsius
                 tempc = (float(value) - 32) * 5/9
@@ -190,8 +194,15 @@ def logecowitt():
                 # Convert degrees Fahrenheit to Kelvin
                 tempk = (float(value) - 32) * 5/9 + 273.15
                 value = "{:.2f}".format(tempk)
-            key = key[:-1]
-            results[key] = value
+            
+            if key == 'tempin':
+                label = 'indoor'
+            elif key == 'temp':
+                label = 'outdoor'
+            else:
+                label = f'ch{key[-1]}'
+
+            metrics['temp'].labels(label).set(value)
 
         # Pressure, default inches Hg
         if key in ['baromrelin', 'baromabsin', 'vpd']:
@@ -325,6 +336,7 @@ def logecowitt():
 if __name__ == "__main__":
 
     # Set up various Prometheus metrics with descriptions and units
+    metrics['temp'] = Gauge(name='temp', documentation='Temperature', unit=temperature_unit, labelnames=['sensor'])
     metrics['tempin'] = Gauge(name='tempin', documentation='Indoor temperature', unit=temperature_unit)
     metrics['temp'] = Gauge(name='temp', documentation='Outdoor temperature', unit=temperature_unit)
     metrics['temp1'] = Gauge(name='temp1', documentation='Temperature sensor 1', unit=temperature_unit)
