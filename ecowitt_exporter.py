@@ -297,13 +297,15 @@ def logecowitt():
             results['battery'] = value
 
         # Rainfall, default inches
-        if key in ['rainratein', 'eventrainin', 'hourlyrainin', 'dailyrainin', 'weeklyrainin', 'monthlyrainin', 'yearlyrainin', 'totalrainin']:
+        if 'rain' in key:
+        # 'rainratein', 'eventrainin', 'hourlyrainin', 'dailyrainin', 'weeklyrainin', 'monthlyrainin', 'yearlyrainin', 'totalrainin'
             if rain_unit == 'mm':
                 # Convert inches to mm
                 rainmm = float(value) * 25.4
                 value = "{:.1f}".format(rainmm)
             key = key[:-2]
-            results[key] = value
+            key = key.replace('rain', '')
+            metrics['rain'].labels(key).set(value)
 
         # Lightning distance, default kilometers
         if key in ['lightning']:
@@ -385,14 +387,7 @@ if __name__ == "__main__":
     metrics['barom'] = Gauge(name='barom', documentation='Barometer', unit=pressure_unit, labelnames=['sensor'])
     metrics['vpd'] = Gauge(name='vpd', documentation='Vapour pressure deficit', unit=pressure_unit)
     metrics['wind'] = Gauge(name='windspeed', documentation='Wind speed', unit=wind_unit, labelnames=['sensor'])
-    metrics['rainrate'] = Gauge(name='rainrate', documentation='Rainfall rate', unit=rain_unit)
-    metrics['eventrain'] = Gauge(name='eventrain', documentation='Event rainfall', unit=rain_unit)
-    metrics['hourlyrain'] = Gauge(name='hourlyrain', documentation='Hourly rainfall', unit=rain_unit)
-    metrics['dailyrain'] = Gauge(name='dailyrain', documentation='Daily rainfall', unit=rain_unit)
-    metrics['weeklyrain'] = Gauge(name='weeklyrain', documentation='Weekly rainfall', unit=rain_unit)
-    metrics['monthlyrain'] = Gauge(name='monthlyrain', documentation='Monthly rainfall', unit=rain_unit)
-    metrics['yearlyrain'] = Gauge(name='yearlyrain', documentation='Yearly rainfall', unit=rain_unit)
-    metrics['totalrain'] = Gauge(name='totalrain', documentation='Total rainfall', unit=rain_unit)
+    metrics['rain'] = Gauge(name='rain', documentation='Rainfall', unit=rain_unit, labelnames=['sensor'])
     metrics['lightning'] = Gauge(name='lightning', documentation='Lightning distance', unit=distance_unit)
     metrics['lightning_num'] = Gauge(name='lightning_num', documentation='Lightning daily count')
 
