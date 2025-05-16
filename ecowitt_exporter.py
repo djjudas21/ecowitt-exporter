@@ -166,6 +166,8 @@ def logecowitt():
 
         # No conversions needed
         if key in ['winddir', 'uv', 'lightning_num']:
+            metrics[key].set(value)
+        
         # Support for WS90 capacitor
         if key in ['ws90cap_volt', 'ws90batt']:
             metrics['ws90'].labels(key).set(value)
@@ -203,7 +205,7 @@ def logecowitt():
                 # Convert degrees W/m2 to foot candle
                 irradiance_lx = float(value) * 6.345
                 value = "{:.2f}".format(irradiance_lx)
-            results[key] = value
+            metrics[key].set(value)
 
         # Temperature, default Fahrenheit
         # 'tempinf', 'tempf', 'temp1f', 'temp2f', 'temp3f', 'temp4f', 'temp5f', 'temp6f', 'temp7f', 'temp8f'
@@ -290,8 +292,7 @@ def logecowitt():
                 rainmm = float(value) * 25.4
                 value = "{:.1f}".format(rainmm)
             mkey = rainmaps[key]
-            results[mkey] = value
-
+            metrics[mkey].set(value)
 
         # Rainfall, default inches
         if 'rain' in key:
@@ -307,12 +308,12 @@ def logecowitt():
         # Lightning distance, default kilometers
         if key in ['lightning']:
             if distance_unit == 'km':
-                results[key] = value
+                metrics[key].set(value)
             elif distance_unit == 'mi':
                 # Convert km to miles
                 distancemi = float(value) / 1.60934
                 value = "{:.2f}".format(distancemi)
-                results[key] = value
+                metrics[key].set(value)
 
     # Add Air Quality Index (AQI)
     if data.get('pm25_avg_24h_ch1'):
