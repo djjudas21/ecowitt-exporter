@@ -1,3 +1,5 @@
+import aqi
+
 def mph2kmh(mph: str) -> str:
     '''Convert mph to km/h'''
     kmh = float(mph) * 1.60934
@@ -57,3 +59,57 @@ def f2k(f: str) -> str:
     '''Convert degrees Fahrenheit to Kelvin'''
     tempk = (float(f) - 32) * 5/9 + 273.15
     return "{:.2f}".format(tempk)
+
+
+
+def aqi_uk(concentration):
+    '''
+    Calculate the AQI using the UK DAQI standard
+    https://en.wikipedia.org/wiki/Air_quality_index#United_Kingdom
+    '''
+    concentration = float(concentration)
+    if concentration < 12:
+        index = 1
+    elif 12 <= concentration < 24:
+        index = 2
+    elif 24 <= concentration < 36:
+        index = 3
+    elif 36 <= concentration < 42:
+        index = 4
+    elif 42 <= concentration < 48:
+        index = 5
+    elif 48 <= concentration < 54:
+        index = 6
+    elif 54 <= concentration < 59:
+        index = 7
+    elif 59 <= concentration < 65:
+        index = 8
+    elif 65 <= concentration < 71:
+        index = 9
+    elif concentration >= 71:
+        index = 10
+    else:
+        index = None
+    return index
+
+def aqi_nepm(concentration):
+    '''
+    Calculate the AQI using the Austration NEPM standard
+    '''
+    concentration = float(concentration)
+    index = int(round(100 * concentration / 25))
+    return index
+
+def aqi_epa(concentration):
+    '''
+    Calculate the AQI using the US EPA standard
+    '''
+    index = aqi.to_iaqi(aqi.POLLUTANT_PM25, concentration, algo=aqi.ALGO_EPA)
+    return index
+
+def aqi_mep(concentration):
+    '''
+    Calculate the AQI using the China MEP standard
+    '''
+    index = aqi.to_iaqi(aqi.POLLUTANT_PM25, concentration, algo=aqi.ALGO_MEP)
+    return index

@@ -1,7 +1,6 @@
-from conversions import mph2kmh, mph2ms, mph2kts, mph2fps, in2mm, km2mi, inhg2hpa, inhg2mmhg, wm22lux, wm22fc, f2c, f2k
+from conversions import mph2kmh, mph2ms, mph2kts, mph2fps, in2mm, km2mi, inhg2hpa, inhg2mmhg, wm22lux, wm22fc, f2c, f2k, aqi_epa, aqi_mep, aqi_nepm, aqi_uk
 import os
 import logging
-import aqi
 from flask import Flask, request
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from prometheus_client import make_wsgi_app, Gauge
@@ -81,58 +80,7 @@ def numify(value):
         return float(value)
     else:
         return value
-    
-def aqi_uk(concentration):
-    '''
-    Calculate the AQI using the UK DAQI standard
-    https://en.wikipedia.org/wiki/Air_quality_index#United_Kingdom
-    '''
-    concentration = float(concentration)
-    if concentration < 12:
-        index = 1
-    elif 12 <= concentration < 24:
-        index = 2
-    elif 24 <= concentration < 36:
-        index = 3
-    elif 36 <= concentration < 42:
-        index = 4
-    elif 42 <= concentration < 48:
-        index = 5
-    elif 48 <= concentration < 54:
-        index = 6
-    elif 54 <= concentration < 59:
-        index = 7
-    elif 59 <= concentration < 65:
-        index = 8
-    elif 65 <= concentration < 71:
-        index = 9
-    elif concentration >= 71:
-        index = 10
-    else:
-        index = None
-    return index
 
-def aqi_nepm(concentration):
-    '''
-    Calculate the AQI using the Austration NEPM standard
-    '''
-    concentration = float(concentration)
-    index = int(round(100 * concentration / 25))
-    return index
-
-def aqi_epa(concentration):
-    '''
-    Calculate the AQI using the US EPA standard
-    '''
-    index = aqi.to_iaqi(aqi.POLLUTANT_PM25, concentration, algo=aqi.ALGO_EPA)
-    return index
-
-def aqi_mep(concentration):
-    '''
-    Calculate the AQI using the China MEP standard
-    '''
-    index = aqi.to_iaqi(aqi.POLLUTANT_PM25, concentration, algo=aqi.ALGO_MEP)
-    return index
 
 # Support for WS90 with a haptic rain sensor
 rainmaps = {
