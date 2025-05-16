@@ -222,7 +222,7 @@ def logecowitt():
             metrics['temp'].labels(label).set(value)
 
         # Pressure, default inches Hg
-        if key in ['baromrelin', 'baromabsin', 'vpd']:
+        if key.startswith('barom'):
             if pressure_unit == 'hpa':
                 # Convert inches Hg to hPa
                 pressurehpa = float(value) * 33.8639
@@ -231,9 +231,26 @@ def logecowitt():
                 # Convert inches Hg to mmHg
                 pressuremmhg = float(value) * 25.4
                 value = "{:.2f}".format(pressuremmhg)
-            if key != 'vpd':
-                key = key[:-2]
-            results[key] = value
+            # Remove 'in' suffix
+            key = key[:-2]
+
+            if key == 'baromrel':
+                label = 'relative'
+            elif key == 'abs':
+                label = 'absolute'
+            metrics['barom'].labels(label).set(value)
+
+        # VPD, default inches Hg
+        if key in ['vpd']:
+            if pressure_unit == 'hpa':
+                # Convert inches Hg to hPa
+                pressurehpa = float(value) * 33.8639
+                value = "{:.2f}".format(pressurehpa)
+            if pressure_unit == 'mmhg':
+                # Convert inches Hg to mmHg
+                pressuremmhg = float(value) * 25.4
+                value = "{:.2f}".format(pressuremmhg)
+            metrics['vpd'].set(value)
 
         # Wind speed, default mph
         if key in ['windspeedmph', 'windgustmph', 'maxdailygust']:
@@ -365,8 +382,7 @@ if __name__ == "__main__":
     metrics['batterystatus'] = Gauge(name='batterystatus', documentation='Battery status', labelnames=['sensor'])
     metrics['batterylevel'] = Gauge(name='batterylevel', documentation='Battery level', labelnames=['sensor'])
     metrics['solarradiation'] = Gauge(name='solarradiation', documentation='Solar irradiance', unit='wm2')
-    metrics['baromrel'] = Gauge(name='baromrel', documentation='Relative barometer', unit=pressure_unit)
-    metrics['baromabs'] = Gauge(name='baromabs', documentation='Absolute barometer', unit=pressure_unit)
+    metrics['barom'] = Gauge(name='barom', documentation='Barometer', unit=pressure_unit, labelnames=['sensor'])
     metrics['vpd'] = Gauge(name='vpd', documentation='Vapour pressure deficit', unit=pressure_unit)
     metrics['wind'] = Gauge(name='windspeed', documentation='Wind speed', unit=wind_unit, labelnames=['sensor'])
     metrics['rainrate'] = Gauge(name='rainrate', documentation='Rainfall rate', unit=rain_unit)
