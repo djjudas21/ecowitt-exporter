@@ -16,6 +16,7 @@ distance_unit = os.environ.get('DISTANCE_UNIT', 'km')
 irradiance_unit = os.environ.get('IRRADIANCE_UNIT', 'wm2')
 aqi_standard = os.environ.get('AQI_STANDARD', 'uk')
 station_id = os.environ.get('STATION_ID', 'ecowitt')
+prefix = os.environ.get('PREFIX', 'ecowitt_')
 
 print ("Ecowitt Exporter")
 print ("================")
@@ -29,6 +30,7 @@ print ('  DISTANCE_UNIT:    ' + distance_unit)
 print ('  IRRADIANCE_UNIT:  ' + irradiance_unit)
 print ('  AQI STANDARD:     ' + aqi_standard)
 print ('  STATION_ID:       ' + station_id)
+print ('  PREFIX:           ' + prefix)
 
 # Declare metrics as a global
 metrics={}
@@ -290,22 +292,22 @@ def logecowitt():
 if __name__ == "__main__":
 
     # Set up various Prometheus metrics with descriptions and units
-    metrics['temp'] = Gauge(name='temp', documentation='Temperature', unit=temperature_unit, labelnames=['sensor'])
-    metrics['humidity'] = Gauge(name='humidity', documentation='Relative humidity', unit='percent', labelnames=['sensor'])
-    metrics['winddir'] = Gauge(name='winddir', documentation='Wind direction', unit='degree')
-    metrics['uv'] = Gauge(name='uv', documentation='UV index')
-    metrics['pm25'] = Gauge(name='pm25', documentation='PM2.5 concentration', labelnames=['sensor'])
-    metrics['aqi'] = Gauge(name='aqi', documentation='Air quality index')
-    metrics['batterystatus'] = Gauge(name='batterystatus', documentation='Battery status', labelnames=['sensor'])
-    metrics['batterylevel'] = Gauge(name='batterylevel', documentation='Battery level', labelnames=['sensor'])
-    metrics['solarradiation'] = Gauge(name='solarradiation', documentation='Solar irradiance', unit='wm2')
-    metrics['barom'] = Gauge(name='barom', documentation='Barometer', unit=pressure_unit, labelnames=['sensor'])
-    metrics['vpd'] = Gauge(name='vpd', documentation='Vapour pressure deficit', unit=pressure_unit)
-    metrics['wind'] = Gauge(name='windspeed', documentation='Wind speed', unit=wind_unit, labelnames=['sensor'])
-    metrics['rain'] = Gauge(name='rain', documentation='Rainfall', unit=rain_unit, labelnames=['sensor'])
-    metrics['lightning'] = Gauge(name='lightning', documentation='Lightning distance', unit=distance_unit)
-    metrics['lightning_num'] = Gauge(name='lightning_num', documentation='Lightning daily count')
-    metrics['ws90'] = Gauge(name='wh90', documentation='WS90 electrical energy stored', unit='volt', labelnames=['sensor'])
+    metrics['temp'] = Gauge(name=prefix+'temp', documentation='Temperature', unit=temperature_unit, labelnames=['sensor'])
+    metrics['humidity'] = Gauge(name=prefix+'humidity', documentation='Relative humidity', unit='percent', labelnames=['sensor'])
+    metrics['winddir'] = Gauge(name=prefix+'winddir', documentation='Wind direction', unit='degree')
+    metrics['uv'] = Gauge(name=prefix+'uv', documentation='UV index')
+    metrics['pm25'] = Gauge(name=prefix+'pm25', documentation='PM2.5 concentration', labelnames=['sensor'])
+    metrics['aqi'] = Gauge(name=prefix+'aqi', documentation='Air quality index')
+    metrics['batterystatus'] = Gauge(name=prefix+'batterystatus', documentation='Battery status', labelnames=['sensor'])
+    metrics['batterylevel'] = Gauge(name=prefix+'batterylevel', documentation='Battery level', labelnames=['sensor'])
+    metrics['solarradiation'] = Gauge(name=prefix+'solarradiation', documentation='Solar irradiance', unit='wm2')
+    metrics['barom'] = Gauge(name=prefix+'barom', documentation='Barometer', unit=pressure_unit, labelnames=['sensor'])
+    metrics['vpd'] = Gauge(name=prefix+'vpd', documentation='Vapour pressure deficit', unit=pressure_unit)
+    metrics['wind'] = Gauge(name=prefix+'windspeed', documentation='Wind speed', unit=wind_unit, labelnames=['sensor'])
+    metrics['rain'] = Gauge(name=prefix+'rain', documentation='Rainfall', unit=rain_unit, labelnames=['sensor'])
+    metrics['lightning'] = Gauge(name=prefix+'lightning', documentation='Lightning distance', unit=distance_unit)
+    metrics['lightning_num'] = Gauge(name=prefix+'lightning_num', documentation='Lightning daily count')
+    metrics['ws90'] = Gauge(name=prefix+'wh90', documentation='WS90 electrical energy stored', unit='volt', labelnames=['sensor'])
 
     # Increase Flask logging if in debug mode
     if debug:
