@@ -165,7 +165,7 @@ def logecowitt():
             continue
 
         # No conversions needed
-        if key in ['winddir', 'uv', 'pm25_ch1', 'pm25_avg_24h_ch1', 'lightning_num']:
+        if key in ['winddir', 'uv', 'lightning_num']:
             results[key] = value
         
         # Battery status & levels
@@ -176,6 +176,12 @@ def logecowitt():
             # Battery status - returns 0 for OK and 1 for low
             else:
                 metrics['batterystatus'].labels(key).set(value)
+
+        # PM25
+        # 'pm25_ch1', 'pm25_avg_24h_ch1'
+        if key.startswith('pm25'):
+            key = key.replace('pm25_', '')
+            metrics['pm25'].labels(key).set(value)
 
         # Humidity - no conversion needed
         if key.startswith('humidity'):
@@ -376,10 +382,7 @@ if __name__ == "__main__":
     metrics['humidity'] = Gauge(name='humidity', documentation='Relative humidity', unit='percent', labelnames=['sensor'])
     metrics['winddir'] = Gauge(name='winddir', documentation='Wind direction', unit='degree')
     metrics['uv'] = Gauge(name='uv', documentation='UV index')
-    metrics['pm25_ch1'] = Gauge(name='pm25_ch1', documentation='PM2.5')
-    metrics['pm25_avg_24h_ch1'] = Gauge(name='pm25_avg_24h_ch1', documentation='PM2.5 24-hour average')
-    metrics['pm25_ch2'] = Gauge(name='pm25_ch2', documentation='PM2.5')
-    metrics['pm25_avg_24h_ch2'] = Gauge(name='pm25_avg_24h_ch2', documentation='PM2.5 24-hour average')
+    metrics['pm25'] = Gauge(name='pm25', documentation='PM2.5 concentration', labelnames=['sensor'])
     metrics['aqi'] = Gauge(name='aqi', documentation='Air quality index')
     metrics['batterystatus'] = Gauge(name='batterystatus', documentation='Battery status', labelnames=['sensor'])
     metrics['batterylevel'] = Gauge(name='batterylevel', documentation='Battery level', labelnames=['sensor'])
