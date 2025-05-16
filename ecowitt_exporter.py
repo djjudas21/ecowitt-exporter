@@ -1,3 +1,4 @@
+from conversions import mph2kmh, mph2ms, mph2kts, mph2fps, in2mm, km2mi, inhg2hpa, inhg2mmhg, wm22lux, wm22fc, f2c, f2k
 import os
 import logging
 import aqi
@@ -198,13 +199,9 @@ def logecowitt():
         # Solar irradiance, default W/m^2
         if key in ['solarradiation']:
             if irradiance_unit == 'lx':
-                # Convert degrees W/m2 to lux
-                irradiance_lx = float(value) / 0.0079
-                value = "{:.2f}".format(irradiance_lx)
+                value = wm22lux(value)
             elif irradiance_unit == 'fc':
-                # Convert degrees W/m2 to foot candle
-                irradiance_lx = float(value) * 6.345
-                value = "{:.2f}".format(irradiance_lx)
+                value = wm22fc(value)
             metrics[key].set(value)
 
         # Temperature, default Fahrenheit
@@ -214,13 +211,9 @@ def logecowitt():
             key = key[:-1]
 
             if temperature_unit == 'c':
-                # Convert degrees Fahrenheit to Celsius
-                tempc = (float(value) - 32) * 5/9
-                value = "{:.2f}".format(tempc)
+                value = f2c(value)
             if temperature_unit == 'k':
-                # Convert degrees Fahrenheit to Kelvin
-                tempk = (float(value) - 32) * 5/9 + 273.15
-                value = "{:.2f}".format(tempk)
+                value = f2k(value)
             
             if key == 'tempin':
                 label = 'indoor'
@@ -234,13 +227,9 @@ def logecowitt():
         # Pressure, default inches Hg
         if key.startswith('barom'):
             if pressure_unit == 'hpa':
-                # Convert inches Hg to hPa
-                pressurehpa = float(value) * 33.8639
-                value = "{:.2f}".format(pressurehpa)
+                value = inhg2hpa(value)
             if pressure_unit == 'mmhg':
-                # Convert inches Hg to mmHg
-                pressuremmhg = float(value) * 25.4
-                value = "{:.2f}".format(pressuremmhg)
+                value = inhg2mmhg(value)
             # Remove 'in' suffix
             key = key[:-2]
 
@@ -253,33 +242,22 @@ def logecowitt():
         # VPD, default inches Hg
         if key in ['vpd']:
             if pressure_unit == 'hpa':
-                # Convert inches Hg to hPa
-                pressurehpa = float(value) * 33.8639
-                value = "{:.2f}".format(pressurehpa)
+                value = inhg2hpa(value)
             if pressure_unit == 'mmhg':
-                # Convert inches Hg to mmHg
-                pressuremmhg = float(value) * 25.4
-                value = "{:.2f}".format(pressuremmhg)
+                value = inhg2mmhg(value)
+
             metrics['vpd'].set(value)
 
         # Wind speed, default mph
         if key in ['windspeedmph', 'windgustmph', 'maxdailygust']:
             if wind_unit == 'kmh':
-                # Convert mph to km/h
-                speedkmh = float(value) * 1.60934
-                value = "{:.2f}".format(speedkmh)
+                value = mph2kmh(value)
             elif wind_unit == 'ms':
-                # Convert mph to m/s
-                speedms = float(value) / 2.237
-                value = "{:.2f}".format(speedms)
+                value = mph2ms(value)
             elif wind_unit == 'knots':
-                # Convert mph to knots
-                speedknots = float(value) / 1.151
-                value = "{:.2f}".format(speedknots)
+                value = mph2kts(value)
             elif wind_unit == 'fps':
-                # Convert mph to fps
-                speedfps = float(value) * 1.467
-                value = "{:.2f}".format(speedfps)
+                value = mph2fps(value)
             if key != 'maxdailygust':
                 key = key[:-3]
             metrics['wind'].labels(key).set(value)
@@ -288,9 +266,7 @@ def logecowitt():
         # pylint: disable=consider-iterating-dictionary
         if key in rainmaps.keys():
             if rain_unit == 'mm':
-                # Convert inches to mm
-                rainmm = float(value) * 25.4
-                value = "{:.1f}".format(rainmm)
+                value = in2mm(value)
             mkey = rainmaps[key]
             metrics[mkey].set(value)
 
@@ -298,9 +274,7 @@ def logecowitt():
         if 'rain' in key:
         # 'rainratein', 'eventrainin', 'hourlyrainin', 'dailyrainin', 'weeklyrainin', 'monthlyrainin', 'yearlyrainin', 'totalrainin'
             if rain_unit == 'mm':
-                # Convert inches to mm
-                rainmm = float(value) * 25.4
-                value = "{:.1f}".format(rainmm)
+                value = in2mm(value)
             key = key[:-2]
             key = key.replace('rain', '')
             metrics['rain'].labels(key).set(value)
@@ -310,9 +284,7 @@ def logecowitt():
             if distance_unit == 'km':
                 metrics[key].set(value)
             elif distance_unit == 'mi':
-                # Convert km to miles
-                distancemi = float(value) / 1.60934
-                value = "{:.2f}".format(distancemi)
+                value = km2mi(value)
                 metrics[key].set(value)
 
     # Add Air Quality Index (AQI)
