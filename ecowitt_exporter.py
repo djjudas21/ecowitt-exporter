@@ -46,44 +46,6 @@ def log_request_info():
     app.logger.debug('Body: %s', request.get_data())
 
 
-def is_integer(element: any) -> bool:
-    """
-    Test if a string can be represent as an integer
-    """
-    if element is None: 
-        return False
-    try:
-        int(element)
-        return True
-    except ValueError:
-        return False
-
-
-def is_float(element: any) -> bool:
-    """
-    Test if a string can be represent as a float
-    """
-    if element is None: 
-        return False
-    try:
-        float(element)
-        return True
-    except ValueError:
-        return False
-
-
-def numify(value):
-    """
-    Convert a string to an integer or float if possible
-    """
-    if is_integer(value):
-        return int(value)
-    elif is_float(value):
-        return float(value)
-    else:
-        return value
-
-
 # Support for WS90 with a haptic rain sensor
 rainmaps = {
         "rrain_piezo": "rainrate",
