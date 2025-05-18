@@ -99,110 +99,102 @@ Then hit Save. It seems to take a couple of minutes for the weather station to s
 
 ## Testing
 
-Real data captured from the Ecowitt weather station with [http-webhook](https://artifacthub.io/packages/helm/securecodebox/http-webhook) to be used as a test:
+Real data has been captured from a Ecowitt GW1100A with this exporter in debug mode. It has been provided in `data.txt` for testing purposes.
 
-```json
-{
-    "path": "/report",
-    "headers": {
-        "host": "192.168.0.65",
-        "connection": "Close",
-        "content-type": "application/x-www-form-urlencoded",
-        "content-length": "493"
-    },
-    "method": "POST",
-    "body": "PASSKEY=573AF40DB42C66057D20631F706CD585&stationtype=EasyWeatherPro_V5.1.1&runtime=0&dateutc=2023-10-20+11:24:35&tempinf=73.4&humidityin=57&baromrelin=28.984&baromabsin=28.603&tempf=59.2&humidity=90&winddir=256&windspeedmph=2.91&windgustmph=4.47&maxdailygust=9.17&solarradiation=96.86&uv=0&rainratein=0.000&eventrainin=1.472&hourlyrainin=0.000&dailyrainin=0.154&weeklyrainin=1.480&monthlyrainin=3.720&yearlyrainin=15.642&totalrainin=15.642&temp1f=59.5&humidity1=79&pm25_ch1=3.0&pm25_avg_24h_ch1=6.8&wh65batt=0&batt1=0&pm25batt1=5&freq=868M&model=WS2900_V2.01.18&interval=60&lightning_num=22&lightning=20&lightning_time=1691007186",
-    "fresh": false,
-    "hostname": "192.168.0.65",
-    "ip": "::ffff:10.1.199.64",
-    "ips": [],
-    "protocol": "http",
-    "query": {},
-    "subdomains": [],
-    "xhr": false,
-    "os": {
-        "hostname": "http-webhook-6675856576-j2jzb"
-    },
-    "connection": {}
-}
-```
-
-This POST request can be simulated with curl:
+A POST request from an Ecowitt device can be simulated with curl:
 
 ```
-curl -d "PASSKEY=573AF40DB42C66057D20631F706CD585&stationtype=EasyWeatherPro_V5.1.1&runtime=0&dateutc=2023-10-20+11:24:35&tempinf=73.4&humidityin=57&baromrelin=28.984&baromabsin=28.603&tempf=59.2&humidity=90&winddir=256&windspeedmph=2.91&windgustmph=4.47&maxdailygust=9.17&solarradiation=96.86&uv=0&rainratein=0.000&eventrainin=1.472&hourlyrainin=0.000&dailyrainin=0.154&weeklyrainin=1.480&monthlyrainin=3.720&yearlyrainin=15.642&totalrainin=15.642&temp1f=59.5&humidity1=79&pm25_ch1=3.0&pm25_avg_24h_ch1=6.8&wh65batt=0&batt1=0&pm25batt1=5&freq=868M&model=WS2900_V2.01.18&interval=60&lightning_num=22&lightning=20&lightning_time=1691007186" -X POST http://192.168.0.65:8080/report
+curl -d @data.txt -X POST http://127.0.0.1:8088/report
 ```
 
 We can then view the corresponding Prometheus metrics with a simple GET request (output has been truncated because it is very long):
 
 ```
-curl http://localhost:8088/metrics
-# HELP tempin_c Indoor temperature
-# TYPE tempin_c gauge
-tempin_c 18.89
-# HELP temp_c Outdoor temperature
-# TYPE temp_c gauge
-temp_c 8.78
-# HELP humidity_percent Outdoor humidity
-# TYPE humidity_percent gauge
-humidity_percent 91.0
-# HELP humidityin_percent Indoor humidity
-# TYPE humidityin_percent gauge
-humidityin_percent 51.0
-# HELP winddir_degree Wind direction
-# TYPE winddir_degree gauge
-winddir_degree 261.0
-# HELP uv UV index
-# TYPE uv gauge
-uv 0.0
-# HELP solarradiation_wm2 Solar irradiance
-# TYPE solarradiation_wm2 gauge
-solarradiation_wm2 57.25
-# HELP baromrel_hpa Relative barometer
-# TYPE baromrel_hpa gauge
-baromrel_hpa 995.11
-# HELP baromabs_hpa Absolute barometer
-# TYPE baromabs_hpa gauge
-baromabs_hpa 995.11
-# HELP windspeed_kmh Wind speed
-# TYPE windspeed_kmh gauge
-windspeed_kmh 14.4
-# HELP windgust_kmh Wind gust
-# TYPE windgust_kmh gauge
-windgust_kmh 23.75
-# HELP maxdailygust_kmh Max daily gust
-# TYPE maxdailygust_kmh gauge
-maxdailygust_kmh 34.92
-# HELP rainrate_mm Rainfall rate
-# TYPE rainrate_mm gauge
-rainrate_mm 0.0
-# HELP eventrain_mm Event rainfall
-# TYPE eventrain_mm gauge
-eventrain_mm 1.8
-# HELP hourlyrain_mm Hourly rainfall
-# TYPE hourlyrain_mm gauge
-hourlyrain_mm 0.0
-# HELP dailyrain_mm Daily rainfall
-# TYPE dailyrain_mm gauge
-dailyrain_mm 0.3
-# HELP weeklyrain_mm Weekly rainfall
-# TYPE weeklyrain_mm gauge
-weeklyrain_mm 2.8
-# HELP monthlyrain_mm Monthly rainfall
-# TYPE monthlyrain_mm gauge
-monthlyrain_mm 36.1
-# HELP yearlyrain_mm Yearly rainfall
-# TYPE yearlyrain_mm gauge
-yearlyrain_mm 616.1
-# HELP totalrain_mm Total rainfall
-# TYPE totalrain_mm gauge
-totalrain_mm 616.1
-# HELP lightning_km Lightning distance
-# TYPE lightning_km gauge
-lightning_km 20.0
-# HELP lightning_num Lightning daily count
-# TYPE lightning_num gauge
-lightning_num 22.0
+curl http://127.0.0.1:8088/metrics                    
+# HELP ecowitt_stationtype_info Ecowitt station type
+# TYPE ecowitt_stationtype_info gauge
+ecowitt_stationtype_info{stationtype="GW1100A_V2.4.0"} 1.0
+# HELP ecowitt_freq_info Ecowitt radio frequency
+# TYPE ecowitt_freq_info gauge
+ecowitt_freq_info{freq="868M"} 1.0
+# HELP ecowitt_model_info Ecowitt model
+# TYPE ecowitt_model_info gauge
+ecowitt_model_info{model="GW1100A"} 1.0
+# HELP ecowitt_temp_c Temperature
+# TYPE ecowitt_temp_c gauge
+ecowitt_temp_c{sensor="indoor"} 29.4
+ecowitt_temp_c{sensor="ch1"} 20.0
+ecowitt_temp_c{sensor="ch2"} 21.3
+ecowitt_temp_c{sensor="ch3"} 22.0
+ecowitt_temp_c{sensor="ch4"} 21.4
+ecowitt_temp_c{sensor="ch5"} 23.0
+ecowitt_temp_c{sensor="ch6"} 24.1
+ecowitt_temp_c{sensor="ch8"} 22.9
+# HELP ecowitt_humidity_percent Relative humidity
+# TYPE ecowitt_humidity_percent gauge
+ecowitt_humidity_percent{sensor="indoor"} 31.0
+ecowitt_humidity_percent{sensor="ch1"} 40.0
+ecowitt_humidity_percent{sensor="ch2"} 48.0
+ecowitt_humidity_percent{sensor="ch3"} 38.0
+ecowitt_humidity_percent{sensor="ch4"} 56.0
+ecowitt_humidity_percent{sensor="ch5"} 40.0
+ecowitt_humidity_percent{sensor="ch6"} 38.0
+ecowitt_humidity_percent{sensor="ch8"} 42.0
+# HELP ecowitt_winddir_degree Wind direction
+# TYPE ecowitt_winddir_degree gauge
+ecowitt_winddir_degree 0.0
+# HELP ecowitt_uv UV index
+# TYPE ecowitt_uv gauge
+ecowitt_uv 0.0
+# HELP ecowitt_pm25 PM2.5 concentration
+# TYPE ecowitt_pm25 gauge
+ecowitt_pm25{sensor="ch2",series="realtime"} 11.0
+ecowitt_pm25{sensor="ch2",series="avg_24h"} 19.5
+# HELP ecowitt_aqi Air quality index
+# TYPE ecowitt_aqi gauge
+ecowitt_aqi 2.0
+# HELP ecowitt_batterystatus Battery status
+# TYPE ecowitt_batterystatus gauge
+ecowitt_batterystatus{sensor="batt1"} 0.0
+ecowitt_batterystatus{sensor="batt2"} 0.0
+ecowitt_batterystatus{sensor="batt3"} 0.0
+ecowitt_batterystatus{sensor="batt4"} 0.0
+ecowitt_batterystatus{sensor="batt5"} 0.0
+ecowitt_batterystatus{sensor="batt6"} 0.0
+ecowitt_batterystatus{sensor="batt8"} 0.0
+# HELP ecowitt_batterylevel Battery level
+# TYPE ecowitt_batterylevel gauge
+ecowitt_batterylevel{sensor="pm25batt2"} 5.0
+ecowitt_batterylevel{sensor="wh57batt"} 4.0
+# HELP ecowitt_solarradiation_wm2 Solar irradiance
+# TYPE ecowitt_solarradiation_wm2 gauge
+ecowitt_solarradiation_wm2 0.0
+# HELP ecowitt_barom_hpa Barometer
+# TYPE ecowitt_barom_hpa gauge
+ecowitt_barom_hpa{sensor="relative"} 1009.21
+# HELP ecowitt_vpd_hpa Vapour pressure deficit
+# TYPE ecowitt_vpd_hpa gauge
+ecowitt_vpd_hpa 0.0
+# HELP ecowitt_windspeed_kmh Wind speed
+# TYPE ecowitt_windspeed_kmh gauge
+# HELP ecowitt_rain_mm Rainfall
+# TYPE ecowitt_rain_mm gauge
+ecowitt_rain_mm{sensor="rate"} 0.0
+ecowitt_rain_mm{sensor="event"} 0.0
+ecowitt_rain_mm{sensor="hourly"} 0.0
+ecowitt_rain_mm{sensor="daily"} 0.0
+ecowitt_rain_mm{sensor="weekly"} 0.0
+ecowitt_rain_mm{sensor="monthly"} 5.3
+ecowitt_rain_mm{sensor="yearly"} 184.9
+ecowitt_rain_mm{sensor="total"} 184.9
+# HELP ecowitt_lightning_km Lightning distance
+# TYPE ecowitt_lightning_km gauge
+ecowitt_lightning_km 31.0
+# HELP ecowitt_lightning_num Lightning daily count
+# TYPE ecowitt_lightning_num gauge
+ecowitt_lightning_num 0.0
+# HELP ecowitt_wh90_volt WS90 electrical energy stored
+# TYPE ecowitt_wh90_volt gauge
 ```
 
 ## Building and running locally
