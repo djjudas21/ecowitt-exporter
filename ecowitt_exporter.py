@@ -1,5 +1,6 @@
 import os
 import logging
+import re
 from flask import Flask, request
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from prometheus_client import make_wsgi_app, Gauge, Info
@@ -101,8 +102,35 @@ def logecowitt():
         # PM25
         # 'pm25_ch1', 'pm25_avg_24h_ch1'
         elif key.startswith('pm25'):
+            # Drop PM25 prefix
             key = key.replace('pm25_', '')
-            metrics['pm25'].labels(key).set(value)
+
+            # Get & drop sensor ch suffix
+            sensorsearch = re.search(r"(ch\d)$", key)
+            if sensorsearch:
+                sensor = sensorsearch.group(1)
+            key = re.sub(r"ch\d$", '', key)
+
+            # Generate series label
+            if key.startswith('avg_24h'):
+                series = 'avg_24h'
+            else:
+                series = 'realtime'
+
+            # Log the PM25 metric
+            metrics['pm25'].labels(series, sensor).set(value)
+
+            # Calculate AQI from PM25
+            if key.startswith('avg_24h'):
+                if aqi_standard == 'uk':
+                    results['aqi'] = aqi_uk(value)
+                    metrics['aqi']
+                elif aqi_standard == 'epa':
+                    results['aqi'] = aqi_epa(value)
+                elif aqi_standard == 'mep':
+                    results['aqi'] = aqi_mep(value)
+                elif aqi_standard == 'nepm':
+                    results['aqi'] = aqi_nepm(value)
 
         # Humidity - no conversion needed
         elif key.startswith('humidity'):
@@ -111,6 +139,7 @@ def logecowitt():
             elif key == 'humidityin':
                 label = 'indoor'
             metrics['humidity'].labels(label).set(value)
+            # TODO: add humidity for all remote temp sensors
 
         # Solar irradiance, default W/m^2
         elif key in ['solarradiation']:
@@ -203,27 +232,6 @@ def logecowitt():
                 value = km2mi(value)
                 metrics[key].set(value)
 
-    # Add Air Quality Index (AQI)
-    if data.get('pm25_avg_24h_ch1'):
-        if aqi_standard == 'uk':
-            results['aqi'] = aqi_uk(data['pm25_avg_24h_ch1'])
-        elif aqi_standard == 'epa':
-            results['aqi'] = aqi_epa(data['pm25_avg_24h_ch1'])
-        elif aqi_standard == 'mep':
-            results['aqi'] = aqi_mep(data['pm25_avg_24h_ch1'])
-        elif aqi_standard == 'nepm':
-            results['aqi'] = aqi_nepm(data['pm25_avg_24h_ch1'])
-
-    if data.get('pm25_avg_24h_ch2'):
-        if aqi_standard == 'uk':
-            results['aqi'] = aqi_uk(data['pm25_avg_24h_ch2'])
-        elif aqi_standard == 'epa':
-            results['aqi'] = aqi_epa(data['pm25_avg_24h_ch2'])
-        elif aqi_standard == 'mep':
-            results['aqi'] = aqi_mep(data['pm25_avg_24h_ch2'])
-        elif aqi_standard == 'nepm':
-            results['aqi'] = aqi_nepm(data['pm25_avg_24h_ch2'])
-
     # Check data from the WH41 PM2.5 sensor
     # If the battery is low it gives junk readings
     # https://github.com/djjudas21/ecowitt-exporter/issues/17
@@ -265,7 +273,7 @@ if __name__ == "__main__":
     metrics['humidity'] = Gauge(name=prefix+'humidity', documentation='Relative humidity', unit='percent', labelnames=['sensor'])
     metrics['winddir'] = Gauge(name=prefix+'winddir', documentation='Wind direction', unit='degree')
     metrics['uv'] = Gauge(name=prefix+'uv', documentation='UV index')
-    metrics['pm25'] = Gauge(name=prefix+'pm25', documentation='PM2.5 concentration', labelnames=['sensor'])
+    metrics['pm25'] = Gauge(name=prefix+'pm25', documentation='PM2.5 concentration', labelnames=['series', 'sensor'])
     metrics['aqi'] = Gauge(name=prefix+'aqi', documentation='Air quality index')
     metrics['batterystatus'] = Gauge(name=prefix+'batterystatus', documentation='Battery status', labelnames=['sensor'])
     metrics['batterylevel'] = Gauge(name=prefix+'batterylevel', documentation='Battery level', labelnames=['sensor'])
