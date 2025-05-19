@@ -122,7 +122,7 @@ def logecowitt():
             # Calculate AQI from PM25
             if key.startswith('avg_24h'):
                 match aqi_standard:
-                    case 'uk:'
+                    case 'uk':
                         metrics['aqi'].labels(aqi_standard).set(aqi_uk(value))
                     case 'epa':
                         metrics['aqi'].labels(aqi_standard).set(aqi_epa(value))
