@@ -210,12 +210,11 @@ def logecowitt():
             metrics['wind'].labels(key).set(value)
         
         # Support for WS90 with a haptic rain sensor
-        # pylint: disable=consider-iterating-dictionary
-        elif key in rainmaps.keys():
+        elif key.endswith('piezo'):
             if rain_unit == 'mm':
                 value = in2mm(value)
             mkey = rainmaps[key]
-            metrics[mkey].set(value)
+            metrics['rain'].labels(mkey).set(value)
 
         # Rainfall, default inches
         elif 'rain' in key:
