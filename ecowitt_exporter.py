@@ -121,15 +121,15 @@ def logecowitt():
 
             # Calculate AQI from PM25
             if key.startswith('avg_24h'):
-                if aqi_standard == 'uk':
-                    results['aqi'] = aqi_uk(value)
-                    metrics['aqi']
-                elif aqi_standard == 'epa':
-                    results['aqi'] = aqi_epa(value)
-                elif aqi_standard == 'mep':
-                    results['aqi'] = aqi_mep(value)
-                elif aqi_standard == 'nepm':
-                    results['aqi'] = aqi_nepm(value)
+                match aqi_standard:
+                    case 'uk:'
+                        metrics['aqi'].labels(aqi_standard).set(aqi_uk(value))
+                    case 'epa':
+                        metrics['aqi'].labels(aqi_standard).set(aqi_epa(value))
+                    case 'mep':
+                        metrics['aqi'].labels(aqi_standard).set(aqi_mep(value))
+                    case 'nepm':
+                        metrics['aqi'].labels(aqi_standard).set(aqi_nepm(value))
 
         # Humidity - no conversion needed
         elif key.startswith('humidity'):
@@ -276,7 +276,7 @@ if __name__ == "__main__":
     metrics['winddir'] = Gauge(name=prefix+'winddir', documentation='Wind direction', unit='degree')
     metrics['uv'] = Gauge(name=prefix+'uv', documentation='UV index')
     metrics['pm25'] = Gauge(name=prefix+'pm25', documentation='PM2.5 concentration', labelnames=['series', 'sensor'])
-    metrics['aqi'] = Gauge(name=prefix+'aqi', documentation='Air quality index')
+    metrics['aqi'] = Gauge(name=prefix+'aqi', documentation='Air quality index', labelnames=['standard'])
     metrics['batterystatus'] = Gauge(name=prefix+'batterystatus', documentation='Battery status', labelnames=['sensor'])
     metrics['batterylevel'] = Gauge(name=prefix+'batterylevel', documentation='Battery level', labelnames=['sensor'])
     metrics['solarradiation'] = Gauge(name=prefix+'solarradiation', documentation='Solar irradiance', unit='wm2')
