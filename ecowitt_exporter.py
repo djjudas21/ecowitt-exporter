@@ -107,8 +107,7 @@ def logecowitt():
 
             # Get & drop sensor ch suffix
             sensorsearch = re.search(r"(ch\d)$", key)
-            if sensorsearch:
-                sensor = sensorsearch.group(1)
+            sensor = sensorsearch.group(1)
             key = re.sub(r"ch\d$", '', key)
 
             # Generate series label
@@ -134,12 +133,15 @@ def logecowitt():
 
         # Humidity - no conversion needed
         elif key.startswith('humidity'):
-            if key == 'humidity':
-                label = 'outdoor'
-            elif key == 'humidityin':
-                label = 'indoor'
+            match key:
+                case 'humidity':
+                    label = 'outdoor'
+                case 'humidityin':
+                    label = 'indoor'
+                case _:
+                    label = f'ch{key[-1]}'
+            # pylint: disable=used-before-assignment
             metrics['humidity'].labels(label).set(value)
-            # TODO: add humidity for all remote temp sensors
 
         # Solar irradiance, default W/m^2
         elif key in ['solarradiation']:
