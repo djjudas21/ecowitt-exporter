@@ -58,14 +58,18 @@ rainmaps = {
         "yrain_piezo": "yearlyrain"
 }
 
-def addmetric(metric: str, value: str, label: str =None):
+def addmetric(metric: str, value: str, label: list = []):
     '''
     Set a metric in the Prometheus exporter 
     and optionally log a debug message.
     '''
     if debug:
         app.logger.debug("Set Prometheus metric %s: %s", metric, value)
-    return metrics[metric].labels(label).set(value)
+    if label:
+        status = metrics[metric].labels(*label).set(value)
+    else:
+        status = metrics[metric].set(value)
+    return status
 
 def calculate_aqi(standard: str, value: str) -> str:
     '''
@@ -109,16 +113,16 @@ def logecowitt():
         
         # Support for WS90 capacitor
         elif key in ['ws90cap_volt', 'ws90batt']:
-            addmetric(metric='ws90', label=key, value=value)
+            addmetric(metric='ws90', label=[key], value=value)
 
         # Battery status & levels
         elif 'batt' in key:
             # Battery level - returns battery level from 0-5
             if key in ['wh57batt', 'pm25batt1', 'pm25batt2']:
-                addmetric(metric='batterylevel', label=key, value=value)
+                addmetric(metric='batterylevel', label=[key], value=value)
             # Battery status - returns 0 for OK and 1 for low
             else:
-                addmetric(metric='batterystatus', label=key, value=value)
+                addmetric(metric='batterystatus', label=[key], value=value)
 
         # PM25
         # 'pm25_ch1', 'pm25_avg_24h_ch1'
@@ -145,12 +149,12 @@ def logecowitt():
                 series = 'realtime'
 
             # Log the PM25 metric
-            addmetric(metric='pm25', label=(series, sensor), value=value)
+            addmetric(metric='pm25', label=[series, sensor], value=value)
 
             # Calculate AQI from PM25
             if key.startswith('avg_24h'):
                 aqi = calculate_aqi(standard=aqi_standard, value=value)
-                addmetric(metric='aqi', label=aqi_standard, value=value)
+                addmetric(metric='aqi', label=[aqi_standard], value=value)
 
         # Humidity - no conversion needed
         elif key.startswith('humidity'):
@@ -162,7 +166,7 @@ def logecowitt():
                 case _:
                     label = f'ch{key[-1]}'
             # pylint: disable=used-before-assignment
-            addmetric(metric='humidity', label=label, value=value)
+            addmetric(metric='humidity', label=[label], value=value)
 
         # Solar irradiance, default W/m^2
         elif key in ['solarradiation']:
@@ -190,7 +194,7 @@ def logecowitt():
             else:
                 label = f'ch{key[-1]}'
 
-            addmetric(metric='temp', label=label, value=value)
+            addmetric(metric='temp', label=[label], value=value)
 
         # Pressure, default inches Hg
         elif key.startswith('barom'):
@@ -205,7 +209,7 @@ def logecowitt():
                 label = 'relative'
             elif key == 'abs':
                 label = 'absolute'
-            addmetric(metric='barom', label=label, value=value)
+            addmetric(metric='barom', label=[label], value=value)
 
         # VPD, default inches Hg
         elif key in ['vpd']:
@@ -228,14 +232,14 @@ def logecowitt():
                 value = mph2fps(value)
             if key != 'maxdailygust':
                 key = key[:-3]
-            addmetric(metric='wind', label=key, value=value)
+            addmetric(metric='wind', label=[key], value=value)
         
         # Support for WS90 with a haptic rain sensor
         elif key.endswith('piezo'):
             if rain_unit == 'mm':
                 value = in2mm(value)
             mkey = rainmaps[key]
-            addmetric(metric='rain', label=kkey, value=value)
+            addmetric(metric='rain', label=[key], value=value)
 
         # Rainfall, default inches
         elif 'rain' in key:
@@ -244,7 +248,7 @@ def logecowitt():
                 value = in2mm(value)
             key = key[:-2]
             key = key.replace('rain', '')
-            addmetric(metric='rain', label=key, value=value)
+            addmetric(metric='rain', label=[key], value=value)
 
         # Lightning distance, default kilometers
         elif key in ['lightning']:
