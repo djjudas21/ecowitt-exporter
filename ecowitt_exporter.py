@@ -58,6 +58,7 @@ rainmaps = {
         "yrain_piezo": "yearlyrain"
 }
 
+# pylint: disable=dangerous-default-value
 def addmetric(metric: str, value: str, label: list = []):
     '''
     Set a metric in the Prometheus exporter 
