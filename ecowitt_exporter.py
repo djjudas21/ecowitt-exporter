@@ -4,7 +4,7 @@ import re
 from flask import Flask, request
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from prometheus_client import make_wsgi_app, Gauge, Info
-from conversions import mph2kmh, mph2ms, mph2kts, mph2fps, in2mm, km2mi, inhg2hpa, inhg2mmhg, wm22lux, wm22fc, f2c, f2k, aqi_epa, aqi_mep, aqi_nepm, aqi_uk
+from conversions import mph2kmh, mph2ms, mph2kts, mph2fps, in2mm, km2mi, inhg2hpa, inhg2mmhg, wm22lux, wm22fc, f2c, f2k, aqi_epa, aqi_mep, aqi_nepm, aqi_uk, epoch2datetime
 
 app = Flask(__name__)
 
@@ -109,7 +109,7 @@ def logecowitt():
             metrics[key].info({key: value})
 
         # No conversions needed
-        elif key in ['winddir', 'uv', 'lightning_num']:
+        elif key in ['winddir', 'uv', 'lightning_num', 'lightning_time']:
             addmetric(metric=key, value=value)
         
         # Support for WS90 capacitor
@@ -289,6 +289,7 @@ if __name__ == "__main__":
     metrics['rain'] = Gauge(name=prefix+'rain', documentation='Rainfall', unit=rain_unit, labelnames=['sensor'])
     metrics['lightning'] = Gauge(name=prefix+'lightning', documentation='Lightning distance', unit=distance_unit)
     metrics['lightning_num'] = Gauge(name=prefix+'lightning_num', documentation='Lightning daily count')
+    metrics['lightning_time'] = Gauge(name=prefix+'lightning_time', documentation='Lightning last strike')
     metrics['ws90'] = Gauge(name=prefix+'wh90', documentation='WS90 electrical energy stored', unit='volt', labelnames=['sensor'])
 
     # Increase Flask logging if in debug mode

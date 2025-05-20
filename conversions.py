@@ -1,4 +1,5 @@
 import aqi
+import datetime
 
 def mph2kmh(mph: str) -> str:
     '''Convert mph to km/h'''
@@ -60,8 +61,6 @@ def f2k(f: str) -> str:
     tempk = (float(f) - 32) * 5/9 + 273.15
     return "{:.2f}".format(tempk)
 
-
-
 def aqi_uk(concentration):
     '''
     Calculate the AQI using the UK DAQI standard
@@ -113,3 +112,6 @@ def aqi_mep(concentration):
     '''
     index = aqi.to_iaqi(aqi.POLLUTANT_PM25, concentration, algo=aqi.ALGO_MEP)
     return index
+
+def epoch2datetime(epoch):
+    return datetime.datetime.fromtimestamp(epoch).strftime('%Y-%m-%d %H:%M:%S')
