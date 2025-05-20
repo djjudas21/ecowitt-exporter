@@ -58,7 +58,7 @@ rainmaps = {
         "yrain_piezo": "yearlyrain"
 }
 
-def addmetric(metric: str, label: str =None, value: str):
+def addmetric(metric: str, value: str, label: str =None):
     '''
     Set a metric in the Prometheus exporter 
     and optionally log a debug message.
