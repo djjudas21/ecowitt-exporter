@@ -81,7 +81,7 @@ def calculate_aqi(standard: str, value: str) -> str:
             aqi = aqi_mep(value)
         case 'nepm':
             aqi = aqi_nepm(value)
-        return aqi
+    return aqi
 
 @app.route('/report', methods=['POST'])
 def logecowitt():
