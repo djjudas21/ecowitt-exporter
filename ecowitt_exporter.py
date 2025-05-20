@@ -169,7 +169,7 @@ def logecowitt():
 
             if temperature_unit == 'c':
                 value = f2c(value)
-            if temperature_unit == 'k':
+            elif temperature_unit == 'k':
                 value = f2k(value)
             
             if key == 'tempin':
@@ -185,7 +185,7 @@ def logecowitt():
         elif key.startswith('barom'):
             if pressure_unit == 'hpa':
                 value = inhg2hpa(value)
-            if pressure_unit == 'mmhg':
+            elif pressure_unit == 'mmhg':
                 value = inhg2mmhg(value)
             # Remove 'in' suffix
             key = key[:-2]
@@ -200,7 +200,7 @@ def logecowitt():
         elif key in ['vpd']:
             if pressure_unit == 'hpa':
                 value = inhg2hpa(value)
-            if pressure_unit == 'mmhg':
+            elif pressure_unit == 'mmhg':
                 value = inhg2mmhg(value)
 
             metrics['vpd'].set(value)
