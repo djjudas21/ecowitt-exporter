@@ -105,11 +105,8 @@ def logecowitt():
             # Check for invalid readings from the WH41 PM2.5 sensor when the battery is low
             # https://github.com/djjudas21/ecowitt-exporter/issues/17
             # If we find bad data, just skip the entire PM2.5 section
-            if data.get('pm25batt1') == '1' and data.get('pm25_ch1') == '1000':
-                app.logger.debug("Drop erroneous PM25 reading 'pm25_ch1': %s", results['pm25_ch1'])
-                continue
-            if data.get('pm25batt2') == '1' and data.get('pm25_ch2') == '1000':
-                app.logger.debug("Drop erroneous PM25 reading 'pm25_ch2': %s", results['pm25_ch1'])
+            if (data.get('pm25batt1') == '1' and data.get('pm25_ch1') == '1000') or (data.get('pm25batt2') == '1' and data.get('pm25_ch2') == '1000'):
+                app.logger.debug(f"Drop erroneous PM25 reading {key}: {value}")
                 continue
 
             # Drop PM25 prefix
