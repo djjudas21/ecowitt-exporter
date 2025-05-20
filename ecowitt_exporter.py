@@ -58,6 +58,21 @@ rainmaps = {
         "yrain_piezo": "yearlyrain"
 }
 
+def calculate_aqi(standard: str, value: str) -> str:
+    '''
+    Calculate AQI (air quality index) using various
+    different national standards.
+    '''
+    match standard:
+        case 'uk':
+            aqi = aqi_uk(value)
+        case 'epa':
+            aqi = aqi_epa(value)
+        case 'mep':
+            aqi = aqi_mep(value)
+        case 'nepm':
+            aqi = aqi_nepm(value)
+        return aqi
 
 @app.route('/report', methods=['POST'])
 def logecowitt():
@@ -128,15 +143,8 @@ def logecowitt():
 
             # Calculate AQI from PM25
             if key.startswith('avg_24h'):
-                match aqi_standard:
-                    case 'uk':
-                        metrics['aqi'].labels(aqi_standard).set(aqi_uk(value))
-                    case 'epa':
-                        metrics['aqi'].labels(aqi_standard).set(aqi_epa(value))
-                    case 'mep':
-                        metrics['aqi'].labels(aqi_standard).set(aqi_mep(value))
-                    case 'nepm':
-                        metrics['aqi'].labels(aqi_standard).set(aqi_nepm(value))
+                aqi = calculate_aqi(standard=aqi_standard, value=value)
+                metrics['aqi'].labels(aqi_standard).set(value)
 
         # Humidity - no conversion needed
         elif key.startswith('humidity'):
