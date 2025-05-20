@@ -250,7 +250,6 @@ def logecowitt():
         del results['aqi']
 
     # Now loop on our processed results and do things with them
-    points = []
     for key, value in results.items():
         # Send the data to the Prometheus exporter
         metrics[key].set(value)
