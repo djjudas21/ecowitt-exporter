@@ -102,6 +102,16 @@ def logecowitt():
         # PM25
         # 'pm25_ch1', 'pm25_avg_24h_ch1'
         elif key.startswith('pm25'):
+            # Check for invalid readings from the WH41 PM2.5 sensor when the battery is low
+            # https://github.com/djjudas21/ecowitt-exporter/issues/17
+            # If we find bad data, just skip the entire PM2.5 section
+            if data.get('pm25batt1') == '1' and data.get('pm25_ch1') == '1000':
+                app.logger.debug("Drop erroneous PM25 reading 'pm25_ch1': %s", results['pm25_ch1'])
+                continue
+            if data.get('pm25batt2') == '1' and data.get('pm25_ch2') == '1000':
+                app.logger.debug("Drop erroneous PM25 reading 'pm25_ch2': %s", results['pm25_ch1'])
+                continue
+
             # Drop PM25 prefix
             key = key.replace('pm25_', '')
 
@@ -232,22 +242,6 @@ def logecowitt():
             elif distance_unit == 'mi':
                 value = km2mi(value)
                 metrics[key].set(value)
-
-    # Check data from the WH41 PM2.5 sensor
-    # If the battery is low it gives junk readings
-    # https://github.com/djjudas21/ecowitt-exporter/issues/17
-    if data.get('pm25batt1') == '1' and data.get('pm25_ch1') == '1000':
-        # Drop erroneous readings
-        app.logger.debug("Drop erroneous PM25 reading 'pm25_ch1': %s", results['pm25_ch1'])
-        del results['pm25_ch1']
-        del results['pm25_avg_24h_ch1']
-        del results['aqi']
-    if data.get('pm25batt2') == '1' and data.get('pm25_ch2') == '1000':
-        # Drop erroneous readings
-        app.logger.debug("Drop erroneous PM25 reading 'pm25_ch2': %s", results['pm25_ch2'])
-        del results['pm25_ch2']
-        del results['pm25_avg_24h_ch2']
-        del results['aqi']
 
     # Now loop on our processed results and do things with them
     for key, value in results.items():
