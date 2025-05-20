@@ -58,6 +58,15 @@ rainmaps = {
         "yrain_piezo": "yearlyrain"
 }
 
+def addmetric(metric: str, label: str, value: str):
+    '''
+    Set a metric in the Prometheus exporter 
+    and optionally log a debug message.
+    '''
+    if debug:
+        app.logger.debug("Set Prometheus metric %s: %s", metric, value)
+    return metrics[metric].labels(label).set(value)
+
 def calculate_aqi(standard: str, value: str) -> str:
     '''
     Calculate AQI (air quality index) using various
@@ -80,12 +89,9 @@ def logecowitt():
     # Retrieve the POST body
     data = request.form
 
-    # Set up a dict to receive the processed results
-    results = {}
-
     for key in data:
         # Process each key from the raw data, do unit conversions if necessary,
-        # then store the results in a new dict called results
+        # then add the results to the Prometheus exporter
         value = data[key]
         app.logger.debug("Received raw value %s: %s", key, value)
 
@@ -99,20 +105,20 @@ def logecowitt():
 
         # No conversions needed
         elif key in ['winddir', 'uv', 'lightning_num']:
-            metrics[key].set(value)
+            addmetric(metric=key, value=value)
         
         # Support for WS90 capacitor
         elif key in ['ws90cap_volt', 'ws90batt']:
-            metrics['ws90'].labels(key).set(value)
+            addmetric(metric='ws90', label=key, value=value)
 
         # Battery status & levels
         elif 'batt' in key:
             # Battery level - returns battery level from 0-5
             if key in ['wh57batt', 'pm25batt1', 'pm25batt2']:
-                metrics['batterylevel'].labels(key).set(value)
+                addmetric(metric='batterylevel', label=key, value=value)
             # Battery status - returns 0 for OK and 1 for low
             else:
-                metrics['batterystatus'].labels(key).set(value)
+                addmetric(metric='batterystatus', label=key, value=value)
 
         # PM25
         # 'pm25_ch1', 'pm25_avg_24h_ch1'
@@ -139,12 +145,12 @@ def logecowitt():
                 series = 'realtime'
 
             # Log the PM25 metric
-            metrics['pm25'].labels(series, sensor).set(value)
+            addmetric(metric='pm25', label=(series, sensor), value=value)
 
             # Calculate AQI from PM25
             if key.startswith('avg_24h'):
                 aqi = calculate_aqi(standard=aqi_standard, value=value)
-                metrics['aqi'].labels(aqi_standard).set(value)
+                addmetric(metric='aqi', label=aqi_standard, value=value)
 
         # Humidity - no conversion needed
         elif key.startswith('humidity'):
@@ -156,7 +162,7 @@ def logecowitt():
                 case _:
                     label = f'ch{key[-1]}'
             # pylint: disable=used-before-assignment
-            metrics['humidity'].labels(label).set(value)
+            addmetric(metric='humidity', label=label, value=value)
 
         # Solar irradiance, default W/m^2
         elif key in ['solarradiation']:
@@ -164,7 +170,7 @@ def logecowitt():
                 value = wm22lux(value)
             elif irradiance_unit == 'fc':
                 value = wm22fc(value)
-            metrics[key].set(value)
+            addmetric(metric='solarradiation', value=value)
 
         # Temperature, default Fahrenheit
         # 'tempinf', 'tempf', 'temp1f', 'temp2f', 'temp3f', 'temp4f', 'temp5f', 'temp6f', 'temp7f', 'temp8f'
@@ -184,7 +190,7 @@ def logecowitt():
             else:
                 label = f'ch{key[-1]}'
 
-            metrics['temp'].labels(label).set(value)
+            addmetric(metric='temp', label=label, value=value)
 
         # Pressure, default inches Hg
         elif key.startswith('barom'):
@@ -199,7 +205,7 @@ def logecowitt():
                 label = 'relative'
             elif key == 'abs':
                 label = 'absolute'
-            metrics['barom'].labels(label).set(value)
+            addmetric(metric='barom', label=label, value=value)
 
         # VPD, default inches Hg
         elif key in ['vpd']:
@@ -208,7 +214,7 @@ def logecowitt():
             elif pressure_unit == 'mmhg':
                 value = inhg2mmhg(value)
 
-            metrics['vpd'].set(value)
+            addmetric(metric='vpd', value=value)
 
         # Wind speed, default mph
         elif key in ['windspeedmph', 'windgustmph', 'maxdailygust']:
@@ -222,14 +228,14 @@ def logecowitt():
                 value = mph2fps(value)
             if key != 'maxdailygust':
                 key = key[:-3]
-            metrics['wind'].labels(key).set(value)
+            addmetric(metric='wind', label=key, value=value)
         
         # Support for WS90 with a haptic rain sensor
         elif key.endswith('piezo'):
             if rain_unit == 'mm':
                 value = in2mm(value)
             mkey = rainmaps[key]
-            metrics['rain'].labels(mkey).set(value)
+            addmetric(metric='rain', label=kkey, value=value)
 
         # Rainfall, default inches
         elif 'rain' in key:
@@ -238,21 +244,16 @@ def logecowitt():
                 value = in2mm(value)
             key = key[:-2]
             key = key.replace('rain', '')
-            metrics['rain'].labels(key).set(value)
+            addmetric(metric='rain', label=key, value=value)
 
         # Lightning distance, default kilometers
         elif key in ['lightning']:
             if distance_unit == 'km':
-                metrics[key].set(value)
+                addmetric(metric='lightning', value=value)
             elif distance_unit == 'mi':
                 value = km2mi(value)
-                metrics[key].set(value)
+                addmetric(metric='lightning', value=value)
 
-    # Now loop on our processed results and do things with them
-    for key, value in results.items():
-        # Send the data to the Prometheus exporter
-        metrics[key].set(value)
-        app.logger.debug("Set Prometheus metric %s: %s", key, value)
 
     # Return a 200 to the weather station
     response = app.response_class(
