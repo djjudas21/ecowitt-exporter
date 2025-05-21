@@ -155,7 +155,7 @@ def logecowitt():
             # Calculate AQI from PM25
             if key.startswith('avg_24h'):
                 aqi = calculate_aqi(standard=aqi_standard, value=value)
-                addmetric(metric='aqi', label=[aqi_standard], value=value)
+                addmetric(metric='aqi', label=[aqi_standard], value=aqi)
 
         # Humidity - no conversion needed
         elif key.startswith('humidity'):
