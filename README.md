@@ -19,6 +19,7 @@ This exporter runs on a single HTTP port (default `8088`) and provides two endpo
 > [!WARNING]  
 > Version v1.x breaks compatibility with previous versions of the ecowitt exporter.
 > Metrics have changed names, labels are now used, and any Prometheus queries you have written will need modification.
+> Support for InfluxDB has been dropped.
 
 ## Supported hardware
 
