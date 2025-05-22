@@ -111,3 +111,38 @@ def aqi_mep(concentration):
     '''
     index = aqi.to_iaqi(aqi.POLLUTANT_PM25, concentration, algo=aqi.ALGO_MEP)
     return index
+
+def mph2beaufort(speed: str):
+    '''
+    Calculate the Beaufort scale number from the windspeed in mph
+    '''
+    speed = float(speed)
+    if speed <= 1:
+        beaufort = 0
+    elif 1 < speed <= 3:
+        beaufort = 1
+    elif 3 < speed <= 7:
+        beaufort = 2
+    elif 7 < speed <= 12:
+        beaufort = 3
+    elif 12 < speed <= 18:
+        beaufort = 4
+    elif 18 < speed <= 24:
+        beaufort = 5
+    elif 24 < speed <= 31:
+        beaufort = 6
+    elif 31 < speed <= 38:
+        beaufort = 7
+    elif 38 < speed <= 46:
+        beaufort = 8
+    elif 46 < speed <= 54:
+        beaufort = 9
+    elif 54 < speed <= 63:
+        beaufort = 10
+    elif 63 < speed <= 73:
+        beaufort = 11
+    elif speed >= 73:
+        beaufort = 12
+    else:
+        beaufort = None
+    return beaufort

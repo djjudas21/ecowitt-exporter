@@ -4,7 +4,7 @@ import re
 from flask import Flask, request
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from prometheus_client import make_wsgi_app, Gauge, Info
-from conversions import mph2kmh, mph2ms, mph2kts, mph2fps, in2mm, km2mi, inhg2hpa, inhg2mmhg, wm22lux, wm22fc, f2c, f2k, aqi_epa, aqi_mep, aqi_nepm, aqi_uk
+from conversions import mph2kmh, mph2ms, mph2kts, mph2fps, in2mm, km2mi, inhg2hpa, inhg2mmhg, wm22lux, wm22fc, f2c, f2k, aqi_epa, aqi_mep, aqi_nepm, aqi_uk, mph2beaufort
 
 app = Flask(__name__)
 
@@ -234,6 +234,10 @@ def logecowitt():
             if key != 'maxdailygust':
                 key = key[:-3]
             addmetric(metric='wind', label=[key], value=value)
+
+            if key == 'windspeedmph':
+                beaufort = mph2beaufort(value)
+                addmetric(metric='wind_beaufort', value=beaufort)
         
         # Support for WS90 with a haptic rain sensor
         elif key.endswith('piezo'):
@@ -286,6 +290,7 @@ if __name__ == "__main__":
     metrics['barom'] = Gauge(name=prefix+'barom', documentation='Barometer', unit=pressure_unit, labelnames=['sensor'])
     metrics['vpd'] = Gauge(name=prefix+'vpd', documentation='Vapour pressure deficit', unit=pressure_unit)
     metrics['wind'] = Gauge(name=prefix+'windspeed', documentation='Wind speed', unit=wind_unit, labelnames=['sensor'])
+    metrics['wind_beaufort'] = Gauge(name=prefix+'windspeed_beaufort', documentation='Wind Beaufort scale')
     metrics['rain'] = Gauge(name=prefix+'rain', documentation='Rainfall', unit=rain_unit, labelnames=['sensor'])
     metrics['lightning'] = Gauge(name=prefix+'lightning', documentation='Lightning distance', unit=distance_unit)
     metrics['lightning_num'] = Gauge(name=prefix+'lightning_num', documentation='Lightning daily count')
