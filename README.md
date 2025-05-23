@@ -61,17 +61,16 @@ alternatives, while Brits will likely want a mixture of both!
 All units are expressed in lower case and without slashes, for simplicity. Apologies to scientists,
 for whom this will be a difficult time.
 
-| Variable           | Default    | Choices                            | Meaning                                                                  |
-|--------------------|------------|------------------------------------|--------------------------------------------------------------------------|
-| `DEBUG`            | `no`       | `no`, `yes`                        | Enable extra output for debugging                                        |
-| `TEMPERATURE_UNIT` | `c`        | `c`, `f`, `k`                      | Temperature in Celsius, Fahrenheit or Kelvin                             |
-| `PRESSURE_UNIT`    | `hpa`      | `hpa`, `in`, `mmhg`                | Pressure in hectopascals (millibars), inches of mercury or mm of mercury |
-| `WIND_UNIT`        | `kmh`      | `kmh`, `mph`, `ms`, `knots`, `fps` | Speed in km/hour, miles/hour, metres/second, knots or feet/second        |
-| `RAIN_UNIT`        | `mm`       | `mm`, `in`                         | Rainfall in millimetres or inches                                        |
-| `IRRADIANCE_UNIT`  | `wm2`      | `wm2`, `lx`, `fc`                  | Solar irradiance in Watts/m^2                                            |
-| `DISTANCE_UNIT`    | `km`       | `km`, `mi`                         | Distance from the last lightning in kilometers                           |
-| `AQI_STANDARD`     | `uk`       | `uk`, `epa`, `mep`, `nepm`         | Air Quality Index standard in UK DAQI, US EPA, China MEP, Australia NEPM |
-| `PREFIX`           | `ecowitt_` |                                    | Prefix to add to every Prometheus metric                                 |
+| Variable           | Default | Choices                            | Meaning                                                                  |
+|--------------------|---------|------------------------------------|--------------------------------------------------------------------------|
+| `DEBUG`            | `no`    | `no`, `yes`                        | Enable extra output for debugging                                        |
+| `TEMPERATURE_UNIT` | `c`     | `c`, `f`, `k`                      | Temperature in Celsius, Fahrenheit or Kelvin                             |
+| `PRESSURE_UNIT`    | `hpa`   | `hpa`, `in`, `mmhg`                | Pressure in hectopascals (millibars), inches of mercury or mm of mercury |
+| `WIND_UNIT`        | `kmh`   | `kmh`, `mph`, `ms`, `knots`, `fps` | Speed in km/hour, miles/hour, metres/second, knots or feet/second        |
+| `RAIN_UNIT`        | `mm`    | `mm`, `in`                         | Rainfall in millimetres or inches                                        |
+| `IRRADIANCE_UNIT`  | `wm2`   | `wm2`, `lx`, `fc`                  | Solar irradiance in Watts/m^2                                            |
+| `DISTANCE_UNIT`    | `km`    | `km`, `mi`                         | Distance from the last lightning in kilometers                           |
+| `AQI_STANDARD`     | `uk`    | `uk`, `epa`, `mep`, `nepm`         | Air Quality Index standard in UK DAQI, US EPA, China MEP, Australia NEPM |
 
 If you want to use one of the units that is not yet supported, please [open an issue](https://github.com/djjudas21/ecowitt-exporter/issues)
 and request it. I can add the code to convert and display other units if there is demand.
