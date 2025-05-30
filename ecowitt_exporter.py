@@ -112,7 +112,7 @@ def logecowitt():
         
         # Support for WS90 capacitor
         elif key in ['ws90cap_volt']:
-            addmetric(metric='ws90', label=[key], value=value)
+            addmetric(metric='ws90', label=[key, 'volt'], value=value)
 
         # Battery status & levels
         elif 'batt' in key:
@@ -128,7 +128,7 @@ def logecowitt():
 
         # Soil moisure
         elif key.startswith('soilmoisture'):
-            addmetric(metric='soilmoisture', label=[key], value=value)
+            addmetric(metric='soilmoisture', label=[key, 'percent'], value=value)
 
         # PM25
         # 'pm25_ch1', 'pm25_avg_24h_ch1'
@@ -172,7 +172,7 @@ def logecowitt():
                 case _:
                     label = f'ch{key[-1]}'
             # pylint: disable=used-before-assignment
-            addmetric(metric='humidity', label=[label], value=value)
+            addmetric(metric='humidity', label=[label, 'percent'], value=value)
 
         # Solar irradiance, default W/m^2
         elif key in ['solarradiation']:
@@ -180,7 +180,7 @@ def logecowitt():
                 value = wm22lux(value)
             elif irradiance_unit == 'fc':
                 value = wm22fc(value)
-            addmetric(metric='solarradiation', value=value)
+            addmetric(metric='solarradiation', label=[irradiance_unit], value=value)
 
         # Temperature, default Fahrenheit
         # 'tempinf', 'tempf', 'temp1f', 'temp2f', 'temp3f', 'temp4f', 'temp5f', 'temp6f', 'temp7f', 'temp8f'
@@ -200,7 +200,7 @@ def logecowitt():
             else:
                 label = f'ch{key[-1]}'
 
-            addmetric(metric='temp', label=[label], value=value)
+            addmetric(metric='temp', label=[label, temperature_unit], value=value)
 
         # Pressure, default inches Hg
         elif key.startswith('barom'):
@@ -215,7 +215,7 @@ def logecowitt():
                 label = 'relative'
             elif key == 'abs':
                 label = 'absolute'
-            addmetric(metric='barom', label=[label], value=value)
+            addmetric(metric='barom', label=[label, pressure_unit], value=value)
 
         # VPD, default inches Hg
         elif key in ['vpd']:
@@ -224,7 +224,7 @@ def logecowitt():
             elif pressure_unit == 'mmhg':
                 value = inhg2mmhg(value)
 
-            addmetric(metric='vpd', value=value)
+            addmetric(metric='vpd', label=[pressure_unit], value=value)
 
         # Wind speed, default mph
         elif key in ['windspeedmph', 'windgustmph', 'maxdailygust']:
@@ -238,7 +238,7 @@ def logecowitt():
                 value = mph2fps(value)
             if key != 'maxdailygust':
                 key = key[:-3]
-            addmetric(metric='wind', label=[key], value=value)
+            addmetric(metric='wind', label=[key, wind_unit], value=value)
 
             if key == 'windspeedmph':
                 beaufort = mph2beaufort(value)
@@ -258,15 +258,15 @@ def logecowitt():
                 value = in2mm(value)
             key = key[:-2]
             key = key.replace('rain', '')
-            addmetric(metric='rain', label=[key], value=value)
+            addmetric(metric='rain', label=[key, rain_unit], value=value)
 
         # Lightning distance, default kilometers
         elif key in ['lightning']:
             if distance_unit == 'km':
-                addmetric(metric='lightning', value=value)
+                addmetric(metric='lightning', label=[distance_unit], value=value)
             elif distance_unit == 'mi':
                 value = km2mi(value)
-                addmetric(metric='lightning', value=value)
+                addmetric(metric='lightning', label=[distance_unit], value=value)
 
 
     # Return a 200 to the weather station
@@ -283,26 +283,26 @@ if __name__ == "__main__":
     metrics['stationtype'] = Info(name='ecowitt_stationtype', documentation='Ecowitt station type')
     metrics['freq'] = Info(name='ecowitt_freq', documentation='Ecowitt radio frequency')
     metrics['model'] = Info(name='ecowitt_model', documentation='Ecowitt model')
-    metrics['temp'] = Gauge(name='ecowitt_temp', documentation='Temperature', unit=temperature_unit, labelnames=['sensor'])
-    metrics['humidity'] = Gauge(name='ecowitt_humidity', documentation='Relative humidity', unit='percent', labelnames=['sensor'])
-    metrics['winddir'] = Gauge(name='ecowitt_winddir', documentation='Wind direction', unit='degree')
+    metrics['temp'] = Gauge(name='ecowitt_temp', documentation='Temperature', labelnames=['sensor', 'unit'])
+    metrics['humidity'] = Gauge(name='ecowitt_humidity', documentation='Relative humidity', labelnames=['sensor', 'unit'])
+    metrics['winddir'] = Gauge(name='ecowitt_winddir', documentation='Wind direction')
     metrics['uv'] = Gauge(name='ecowitt_uv', documentation='UV index')
     metrics['pm25'] = Gauge(name='ecowitt_pm25', documentation='PM2.5 concentration', labelnames=['series', 'sensor'])
     metrics['aqi'] = Gauge(name='ecowitt_aqi', documentation='Air quality index', labelnames=['standard'])
     metrics['batterystatus'] = Gauge(name='ecowitt_batterystatus', documentation='Battery status', labelnames=['sensor'])
     metrics['batterylevel'] = Gauge(name='ecowitt_batterylevel', documentation='Battery level', labelnames=['sensor'])
     metrics['batteryvoltage'] = Gauge(name='ecowitt_batteryvoltage', documentation='Battery voltage', labelnames=['sensor'])
-    metrics['solarradiation'] = Gauge(name='ecowitt_solarradiation', documentation='Solar irradiance', unit='wm2')
-    metrics['barom'] = Gauge(name='ecowitt_barom', documentation='Barometer', unit=pressure_unit, labelnames=['sensor'])
-    metrics['vpd'] = Gauge(name='ecowitt_vpd', documentation='Vapour pressure deficit', unit=pressure_unit)
-    metrics['wind'] = Gauge(name='ecowitt_windspeed', documentation='Wind speed', unit=wind_unit, labelnames=['sensor'])
+    metrics['solarradiation'] = Gauge(name='ecowitt_solarradiation', documentation='Solar irradiance', labelnames=['unit'])
+    metrics['barom'] = Gauge(name='ecowitt_barom', documentation='Barometer', labelnames=['sensor', 'unit'])
+    metrics['vpd'] = Gauge(name='ecowitt_vpd', documentation='Vapour pressure deficit', labelnames=['unit'])
+    metrics['wind'] = Gauge(name='ecowitt_windspeed', documentation='Wind speed', labelnames=['sensor', 'unit'])
     metrics['wind_beaufort'] = Gauge(name='ecowitt_windspeed_beaufort', documentation='Wind Beaufort scale')
-    metrics['rain'] = Gauge(name='ecowitt_rain', documentation='Rainfall', unit=rain_unit, labelnames=['sensor'])
-    metrics['lightning'] = Gauge(name='ecowitt_lightning', documentation='Lightning distance', unit=distance_unit)
+    metrics['rain'] = Gauge(name='ecowitt_rain', documentation='Rainfall', labelnames=['sensor', 'unit'])
+    metrics['lightning'] = Gauge(name='ecowitt_lightning', documentation='Lightning distance', labelnames=['unit'])
     metrics['lightning_num'] = Gauge(name='ecowitt_lightning_num', documentation='Lightning daily count')
     metrics['lightning_time'] = Gauge(name='ecowitt_lightning_time', documentation='Lightning last strike')
-    metrics['ws90'] = Gauge(name='ecowitt_wh90', documentation='WS90 electrical energy stored', unit='volt', labelnames=['sensor'])
-    metrics['soilmoisture'] = Gauge(name='ecowitt_soilmoisture', documentation='Soil moisture', unit='percent', labelnames=['sensor'])
+    metrics['ws90'] = Gauge(name='ecowitt_wh90', documentation='WS90 electrical energy stored', labelnames=['sensor', 'unit'])
+    metrics['soilmoisture'] = Gauge(name='ecowitt_soilmoisture', documentation='Soil moisture', labelnames=['sensor', 'unit'])
 
     # Increase Flask logging if in debug mode
     if debug:

@@ -127,31 +127,31 @@ ecowitt_freq_info{freq="868M"} 1.0
 # HELP ecowitt_model_info Ecowitt model
 # TYPE ecowitt_model_info gauge
 ecowitt_model_info{model="GW1100A"} 1.0
-# HELP ecowitt_temp_c Temperature
-# TYPE ecowitt_temp_c gauge
-ecowitt_temp_c{sensor="indoor"} 30.1
-ecowitt_temp_c{sensor="outdoor"} 17.7
-ecowitt_temp_c{sensor="ch1"} 23.5
-ecowitt_temp_c{sensor="ch2"} 21.7
-ecowitt_temp_c{sensor="ch3"} 24.4
-ecowitt_temp_c{sensor="ch4"} 22.8
-ecowitt_temp_c{sensor="ch5"} 24.3
-ecowitt_temp_c{sensor="ch6"} 25.4
-ecowitt_temp_c{sensor="ch8"} 23.3
-# HELP ecowitt_humidity_percent Relative humidity
-# TYPE ecowitt_humidity_percent gauge
-ecowitt_humidity_percent{sensor="indoor"} 41.0
-ecowitt_humidity_percent{sensor="outdoor"} 75.0
-ecowitt_humidity_percent{sensor="ch1"} 57.0
-ecowitt_humidity_percent{sensor="ch2"} 61.0
-ecowitt_humidity_percent{sensor="ch3"} 54.0
-ecowitt_humidity_percent{sensor="ch4"} 62.0
-ecowitt_humidity_percent{sensor="ch5"} 54.0
-ecowitt_humidity_percent{sensor="ch6"} 45.0
-ecowitt_humidity_percent{sensor="ch8"} 58.0
-# HELP ecowitt_winddir_degree Wind direction
-# TYPE ecowitt_winddir_degree gauge
-ecowitt_winddir_degree 173.0
+# HELP ecowitt_temp Temperature
+# TYPE ecowitt_temp gauge
+ecowitt_temp{sensor="indoor",unit="c"} 30.1
+ecowitt_temp{sensor="outdoor",unit="c"} 17.7
+ecowitt_temp{sensor="ch1",unit="c"} 23.5
+ecowitt_temp{sensor="ch2",unit="c"} 21.7
+ecowitt_temp{sensor="ch3",unit="c"} 24.4
+ecowitt_temp{sensor="ch4",unit="c"} 22.8
+ecowitt_temp{sensor="ch5",unit="c"} 24.3
+ecowitt_temp{sensor="ch6",unit="c"} 25.4
+ecowitt_temp{sensor="ch8",unit="c"} 23.3
+# HELP ecowitt_humidity Relative humidity
+# TYPE ecowitt_humidity gauge
+ecowitt_humidity{sensor="indoor",unit="percent"} 41.0
+ecowitt_humidity{sensor="outdoor",unit="percent"} 75.0
+ecowitt_humidity{sensor="ch1",unit="percent"} 57.0
+ecowitt_humidity{sensor="ch2",unit="percent"} 61.0
+ecowitt_humidity{sensor="ch3",unit="percent"} 54.0
+ecowitt_humidity{sensor="ch4",unit="percent"} 62.0
+ecowitt_humidity{sensor="ch5",unit="percent"} 54.0
+ecowitt_humidity{sensor="ch6",unit="percent"} 45.0
+ecowitt_humidity{sensor="ch8",unit="percent"} 58.0
+# HELP ecowitt_winddir Wind direction
+# TYPE ecowitt_winddir gauge
+ecowitt_winddir 173.0
 # HELP ecowitt_uv UV index
 # TYPE ecowitt_uv gauge
 ecowitt_uv 0.0
@@ -179,47 +179,47 @@ ecowitt_batterylevel{sensor="wh57batt"} 4.0
 # HELP ecowitt_batteryvoltage Battery voltage
 # TYPE ecowitt_batteryvoltage gauge
 ecowitt_batteryvoltage{sensor="soilbatt1"} 1.7
-# HELP ecowitt_solarradiation_wm2 Solar irradiance
-# TYPE ecowitt_solarradiation_wm2 gauge
-ecowitt_solarradiation_wm2 29.22
-# HELP ecowitt_barom_hpa Barometer
-# TYPE ecowitt_barom_hpa gauge
-ecowitt_barom_hpa{sensor="relative"} 1008.6
-# HELP ecowitt_vpd_hpa Vapour pressure deficit
-# TYPE ecowitt_vpd_hpa gauge
-ecowitt_vpd_hpa 5.08
-# HELP ecowitt_windspeed_kmh Wind speed
-# TYPE ecowitt_windspeed_kmh gauge
-ecowitt_windspeed_kmh{sensor="windspeed"} 0.0
-ecowitt_windspeed_kmh{sensor="windgust"} 5.41
-ecowitt_windspeed_kmh{sensor="maxdailygust"} 11.15
+# HELP ecowitt_solarradiation Solar irradiance
+# TYPE ecowitt_solarradiation gauge
+ecowitt_solarradiation{unit="wm2"} 29.22
+# HELP ecowitt_barom Barometer
+# TYPE ecowitt_barom gauge
+ecowitt_barom{sensor="relative",unit="hpa"} 1008.6
+# HELP ecowitt_vpd Vapour pressure deficit
+# TYPE ecowitt_vpd gauge
+ecowitt_vpd{unit="hpa"} 5.08
+# HELP ecowitt_windspeed Wind speed
+# TYPE ecowitt_windspeed gauge
+ecowitt_windspeed{sensor="windspeed",unit="kmh"} 0.0
+ecowitt_windspeed{sensor="windgust",unit="kmh"} 5.41
+ecowitt_windspeed{sensor="maxdailygust",unit="kmh"} 11.15
 # HELP ecowitt_windspeed_beaufort Wind Beaufort scale
 # TYPE ecowitt_windspeed_beaufort gauge
 ecowitt_windspeed_beaufort 0.0
-# HELP ecowitt_rain_mm Rainfall
-# TYPE ecowitt_rain_mm gauge
-ecowitt_rain_mm{sensor="rate"} 0.0
-ecowitt_rain_mm{sensor="event"} 0.0
-ecowitt_rain_mm{sensor="hourly"} 0.0
-ecowitt_rain_mm{sensor="daily"} 0.0
-ecowitt_rain_mm{sensor="weekly"} 17.7
-ecowitt_rain_mm{sensor="monthly"} 30.7
-ecowitt_rain_mm{sensor="yearly"} 210.3
-ecowitt_rain_mm{sensor="total"} 210.3
-# HELP ecowitt_lightning_km Lightning distance
-# TYPE ecowitt_lightning_km gauge
-ecowitt_lightning_km 34.0
+# HELP ecowitt_rain Rainfall
+# TYPE ecowitt_rain gauge
+ecowitt_rain{sensor="rate",unit="mm"} 0.0
+ecowitt_rain{sensor="event",unit="mm"} 0.0
+ecowitt_rain{sensor="hourly",unit="mm"} 0.0
+ecowitt_rain{sensor="daily",unit="mm"} 0.0
+ecowitt_rain{sensor="weekly",unit="mm"} 17.7
+ecowitt_rain{sensor="monthly",unit="mm"} 30.7
+ecowitt_rain{sensor="yearly",unit="mm"} 210.3
+ecowitt_rain{sensor="total",unit="mm"} 210.3
+# HELP ecowitt_lightning Lightning distance
+# TYPE ecowitt_lightning gauge
+ecowitt_lightning{unit="km"} 34.0
 # HELP ecowitt_lightning_num Lightning daily count
 # TYPE ecowitt_lightning_num gauge
 ecowitt_lightning_num 0.0
 # HELP ecowitt_lightning_time Lightning last strike
 # TYPE ecowitt_lightning_time gauge
 ecowitt_lightning_time 1.747849832e+09
-# HELP ecowitt_wh90_volt WS90 electrical energy stored
-# TYPE ecowitt_wh90_volt gauge
-# HELP ecowitt_soilmoisture_percent Soil moisture
-# TYPE ecowitt_soilmoisture_percent gauge
-ecowitt_soilmoisture_percent{sensor="soilmoisture1"} 0.0
+# HELP ecowitt_wh90 WS90 electrical energy stored
+# TYPE ecowitt_wh90 gauge
+# HELP ecowitt_soilmoisture Soil moisture
+# TYPE ecowitt_soilmoisture gauge
+ecowitt_soilmoisture{sensor="soilmoisture1",unit="percent"} 0.0
 ```
 
 ## Building and running locally
