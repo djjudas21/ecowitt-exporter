@@ -41,6 +41,7 @@ that does or doesn't work, please raise an issue so I can update the list.
 - WN31/WH31 Multi-Channel Temperature & Humidity Sensor
 - WN32/WH32 Single-Channel Temperature & Humidity Sensor
 - WN36 Floating Pool Temperature Sensor
+- WH51 Soil Moisture Meter
 
 ## Note about Ecowitt firmware
 
