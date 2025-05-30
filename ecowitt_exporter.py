@@ -119,9 +119,16 @@ def logecowitt():
             # Battery level - returns battery level from 0-5
             if key in ['wh57batt', 'pm25batt1', 'pm25batt2']:
                 addmetric(metric='batterylevel', label=[key], value=value)
+            # Battery voltage - returns a decimal voltage e.g. 1.7
+            elif key.startswith('soil'):
+                addmetric(metric='batteryvoltage', label=[key], value=value)
             # Battery status - returns 0 for OK and 1 for low
             else:
                 addmetric(metric='batterystatus', label=[key], value=value)
+
+        # Soil moisure
+        elif key.startswith('soilmoisture'):
+            addmetric(metric='soilmoisture', label=[key], value=value)
 
         # PM25
         # 'pm25_ch1', 'pm25_avg_24h_ch1'
@@ -284,6 +291,7 @@ if __name__ == "__main__":
     metrics['aqi'] = Gauge(name='ecowitt_aqi', documentation='Air quality index', labelnames=['standard'])
     metrics['batterystatus'] = Gauge(name='ecowitt_batterystatus', documentation='Battery status', labelnames=['sensor'])
     metrics['batterylevel'] = Gauge(name='ecowitt_batterylevel', documentation='Battery level', labelnames=['sensor'])
+    metrics['batteryvoltage'] = Gauge(name='ecowitt_batteryvoltage', documentation='Battery voltage', labelnames=['sensor'])
     metrics['solarradiation'] = Gauge(name='ecowitt_solarradiation', documentation='Solar irradiance', unit='wm2')
     metrics['barom'] = Gauge(name='ecowitt_barom', documentation='Barometer', unit=pressure_unit, labelnames=['sensor'])
     metrics['vpd'] = Gauge(name='ecowitt_vpd', documentation='Vapour pressure deficit', unit=pressure_unit)
@@ -294,6 +302,7 @@ if __name__ == "__main__":
     metrics['lightning_num'] = Gauge(name='ecowitt_lightning_num', documentation='Lightning daily count')
     metrics['lightning_time'] = Gauge(name='ecowitt_lightning_time', documentation='Lightning last strike')
     metrics['ws90'] = Gauge(name='ecowitt_wh90', documentation='WS90 electrical energy stored', unit='volt', labelnames=['sensor'])
+    metrics['soilmoisture'] = Gauge(name='ecowitt_soilmoisture', documentation='Soil moisture', unit='percent', labelnames=['sensor'])
 
     # Increase Flask logging if in debug mode
     if debug:
