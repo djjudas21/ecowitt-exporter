@@ -111,7 +111,7 @@ def logecowitt():
             addmetric(metric=key, value=value)
         
         # Support for WS90 capacitor
-        elif key in ['ws90cap_volt', 'ws90batt']:
+        elif key in ['ws90cap_volt']:
             addmetric(metric='ws90', label=[key], value=value)
 
         # Battery status & levels
@@ -120,7 +120,7 @@ def logecowitt():
             if key in ['wh57batt', 'pm25batt1', 'pm25batt2']:
                 addmetric(metric='batterylevel', label=[key], value=value)
             # Battery voltage - returns a decimal voltage e.g. 1.7
-            elif key.startswith('soil'):
+            elif key.startswith('soil') or key.startswith('ws90'):
                 addmetric(metric='batteryvoltage', label=[key], value=value)
             # Battery status - returns 0 for OK and 1 for low
             else:
