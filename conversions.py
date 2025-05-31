@@ -15,11 +15,6 @@ def mph2kts(mph: str) -> str:
     knots = float(mph) / 1.151
     return "{:.2f}".format(knots)
 
-def mph2fps(mph: str) -> str:
-    '''Convert mph to fps'''
-    fps = float(mph) * 1.467
-    return "{:.2f}".format(fps)
-
 def in2mm(inches: str) -> str:
     '''Convert inches to mm'''
     mm = float(inches) * 25.4
@@ -35,19 +30,9 @@ def inhg2hpa(inhg: str) -> str:
     pressurehpa = float(inhg) * 33.8639
     return "{:.2f}".format(pressurehpa)
 
-def inhg2mmhg(inhg: str) -> str:
-    '''Convert inches Hg to mmHg'''
-    pressuremmhg = float(inhg) * 25.4
-    return "{:.2f}".format(pressuremmhg)
-
 def wm22lux(wm2: str) -> str:
     '''Convert degrees W/m2 to lux'''
     irradiance_lx = float(wm2) / 0.0079
-    return "{:.2f}".format(irradiance_lx)
-
-def wm22fc(wm2: str) -> str:
-    '''Convert degrees W/m2 to foot candle'''
-    irradiance_lx = float(wm2) * 6.345
     return "{:.2f}".format(irradiance_lx)
 
 def f2c(f: str) -> str:
