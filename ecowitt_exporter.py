@@ -121,7 +121,7 @@ def logecowitt():
                 addmetric(metric='batterylevel', label=[key], value=value)
             # Battery voltage - returns a decimal voltage e.g. 1.7
             elif key.startswith('soil') or key.startswith('ws90'):
-                addmetric(metric='batteryvoltage', label=[key], value=value)
+                addmetric(metric='batteryvoltage', label=[key, 'volt'], value=value)
             # Battery status - returns 0 for OK and 1 for low
             else:
                 addmetric(metric='batterystatus', label=[key], value=value)
@@ -155,7 +155,7 @@ def logecowitt():
                 series = 'realtime'
 
             # Log the PM25 metric
-            addmetric(metric='pm25', label=[series, sensor], value=value)
+            addmetric(metric='pm25', label=[series, sensor, 'conμgm3'], value=value)
 
             # Calculate AQI from PM25
             if key.startswith('avg_24h'):
@@ -241,7 +241,7 @@ def logecowitt():
             if rain_unit == 'lengthmm':
                 value = in2mm(value)
             mkey = rainmaps[key]
-            addmetric(metric='rain', label=[key], value=value)
+            addmetric(metric='rain', label=[key, rain_unit], value=value)
 
         # Rainfall, default inches
         elif 'rain' in key:
@@ -277,11 +277,11 @@ if __name__ == "__main__":
     metrics['humidity'] = Gauge(name='ecowitt_humidity', documentation='Relative humidity', labelnames=['sensor', 'unit'])
     metrics['winddir'] = Gauge(name='ecowitt_winddir', documentation='Wind direction')
     metrics['uv'] = Gauge(name='ecowitt_uv', documentation='UV index')
-    metrics['pm25'] = Gauge(name='ecowitt_pm25', documentation='PM2.5 concentration', labelnames=['series', 'sensor'])
+    metrics['pm25'] = Gauge(name='ecowitt_pm25', documentation='PM2.5 concentration', labelnames=['series', 'sensor', 'unit'])
     metrics['aqi'] = Gauge(name='ecowitt_aqi', documentation='Air quality index', labelnames=['standard'])
     metrics['batterystatus'] = Gauge(name='ecowitt_batterystatus', documentation='Battery status', labelnames=['sensor'])
     metrics['batterylevel'] = Gauge(name='ecowitt_batterylevel', documentation='Battery level', labelnames=['sensor'])
-    metrics['batteryvoltage'] = Gauge(name='ecowitt_batteryvoltage', documentation='Battery voltage', labelnames=['sensor'])
+    metrics['batteryvoltage'] = Gauge(name='ecowitt_batteryvoltage', documentation='Battery voltage', labelnames=['sensor', 'unit'])
     metrics['solarradiation'] = Gauge(name='ecowitt_solarradiation', documentation='Solar irradiance', labelnames=['unit'])
     metrics['barom'] = Gauge(name='ecowitt_barom', documentation='Barometer', labelnames=['sensor', 'unit'])
     metrics['vpd'] = Gauge(name='ecowitt_vpd', documentation='Vapour pressure deficit', labelnames=['unit'])
