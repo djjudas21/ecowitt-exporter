@@ -4,17 +4,17 @@ import re
 from flask import Flask, request
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from prometheus_client import make_wsgi_app, Gauge, Info
-from conversions import mph2kmh, mph2ms, mph2kts, in2mm, km2mi, inhg2hpa, wm22lux, f2c, f2k, aqi_epa, aqi_mep, aqi_nepm, aqi_uk, mph2beaufort
+from conversions import mph2kmh, mph2ms, mph2kts, mph2fps, in2mm, km2mi, inhg2hpa, inhg2mmhg, wm22lux, wm22fc, f2c, f2k, aqi_epa, aqi_mep, aqi_nepm, aqi_uk, mph2beaufort
 
 app = Flask(__name__)
 
 debug = os.environ.get('DEBUG', 'no') == 'yes'
-temperature_unit = os.environ.get('TEMPERATURE_UNIT', 'celsius')
-pressure_unit = os.environ.get('PRESSURE_UNIT', 'pressurehpa')
-wind_unit = os.environ.get('WIND_UNIT', 'velocitykmh')
-rain_unit = os.environ.get('RAIN_UNIT', 'lengthmm')
-distance_unit = os.environ.get('DISTANCE_UNIT', 'lengthkm')
-irradiance_unit = os.environ.get('IRRADIANCE_UNIT', 'Wm2')
+temperature_unit = os.environ.get('TEMPERATURE_UNIT', 'c')
+pressure_unit = os.environ.get('PRESSURE_UNIT', 'hpa')
+wind_unit = os.environ.get('WIND_UNIT', 'kmh')
+rain_unit = os.environ.get('RAIN_UNIT', 'mm')
+distance_unit = os.environ.get('DISTANCE_UNIT', 'km')
+irradiance_unit = os.environ.get('IRRADIANCE_UNIT', 'wm2')
 aqi_standard = os.environ.get('AQI_STANDARD', 'uk')
 station_id = os.environ.get('STATION_ID', 'ecowitt')
 
@@ -176,8 +176,10 @@ def logecowitt():
 
         # Solar irradiance, default W/m^2
         elif key in ['solarradiation']:
-            if irradiance_unit == 'lux':
+            if irradiance_unit == 'lx':
                 value = wm22lux(value)
+            elif irradiance_unit == 'fc':
+                value = wm22fc(value)
             addmetric(metric='solarradiation', label=[irradiance_unit], value=value)
 
         # Temperature, default Fahrenheit
@@ -186,9 +188,9 @@ def logecowitt():
             # Strip trailing f
             key = key[:-1]
 
-            if temperature_unit == 'celsius':
+            if temperature_unit == 'c':
                 value = f2c(value)
-            elif temperature_unit == 'kelvin':
+            elif temperature_unit == 'k':
                 value = f2k(value)
             
             if key == 'tempin':
@@ -202,8 +204,10 @@ def logecowitt():
 
         # Pressure, default inches Hg
         elif key.startswith('barom'):
-            if pressure_unit == 'pressurehpa':
+            if pressure_unit == 'hpa':
                 value = inhg2hpa(value)
+            elif pressure_unit == 'mmhg':
+                value = inhg2mmhg(value)
             # Remove 'in' suffix
             key = key[:-2]
 
@@ -215,19 +219,23 @@ def logecowitt():
 
         # VPD, default inches Hg
         elif key in ['vpd']:
-            if pressure_unit == 'pressurehpa':
+            if pressure_unit == 'hpa':
                 value = inhg2hpa(value)
+            elif pressure_unit == 'mmhg':
+                value = inhg2mmhg(value)
 
             addmetric(metric='vpd', label=[pressure_unit], value=value)
 
         # Wind speed, default mph
         elif key in ['windspeedmph', 'windgustmph', 'maxdailygust']:
-            if wind_unit == 'velocitykmh':
+            if wind_unit == 'kmh':
                 value = mph2kmh(value)
-            elif wind_unit == 'velocityms':
+            elif wind_unit == 'ms':
                 value = mph2ms(value)
-            elif wind_unit == 'velocityknot':
+            elif wind_unit == 'knots':
                 value = mph2kts(value)
+            elif wind_unit == 'fps':
+                value = mph2fps(value)
             if key != 'maxdailygust':
                 key = key[:-3]
             addmetric(metric='wind', label=[key, wind_unit], value=value)
@@ -238,7 +246,7 @@ def logecowitt():
         
         # Support for WS90 with a haptic rain sensor
         elif key.endswith('piezo'):
-            if rain_unit == 'lengthmm':
+            if rain_unit == 'mm':
                 value = in2mm(value)
             mkey = rainmaps[key]
             addmetric(metric='rain', label=[key], value=value)
@@ -246,7 +254,7 @@ def logecowitt():
         # Rainfall, default inches
         elif 'rain' in key:
         # 'rainratein', 'eventrainin', 'hourlyrainin', 'dailyrainin', 'weeklyrainin', 'monthlyrainin', 'yearlyrainin', 'totalrainin'
-            if rain_unit == 'lengthmm':
+            if rain_unit == 'mm':
                 value = in2mm(value)
             key = key[:-2]
             key = key.replace('rain', '')
@@ -254,9 +262,11 @@ def logecowitt():
 
         # Lightning distance, default kilometers
         elif key in ['lightning']:
-            if distance_unit == 'lengthmi':
+            if distance_unit == 'km':
+                addmetric(metric='lightning', label=[distance_unit], value=value)
+            elif distance_unit == 'mi':
                 value = km2mi(value)
-            addmetric(metric='lightning', label=[distance_unit], value=value)
+                addmetric(metric='lightning', label=[distance_unit], value=value)
 
 
     # Return a 200 to the weather station
