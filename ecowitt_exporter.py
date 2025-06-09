@@ -236,13 +236,14 @@ def logecowitt():
                 value = mph2kts(value)
             elif wind_unit == 'fps':
                 value = mph2fps(value)
-            if key != 'maxdailygust':
-                key = key[:-3]
-            addmetric(metric='wind', label=[key, wind_unit], value=value)
 
             if key == 'windspeedmph':
                 beaufort = mph2beaufort(value)
                 addmetric(metric='wind_beaufort', value=beaufort)
+
+            if key != 'maxdailygust':
+                key = key[:-3]
+            addmetric(metric='wind', label=[key, wind_unit], value=value)
         
         # Support for WS90 with a haptic rain sensor
         elif key.endswith('piezo'):
