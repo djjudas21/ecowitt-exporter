@@ -89,6 +89,9 @@ helm repo update djjudas21
 helm install -n monitoring ecowitt-exporter djjudas21/ecowitt-exporter
 ```
 
+An accompanying [Grafana dashboard](https://github.com/djjudas21/grafana-dashboards/blob/main/Ecowitt%20Weather%20Station.json)
+is available and can be imported manually into your Grafana instance.
+
 ## How to configure your weather station
 
 After deploying via Helm, it will print some output to explain how to find the IP and/or hostname of the exporter running in Kubernetes.
@@ -157,8 +160,8 @@ ecowitt_winddir 173.0
 ecowitt_uv 0.0
 # HELP ecowitt_pm25 PM2.5 concentration
 # TYPE ecowitt_pm25 gauge
-ecowitt_pm25{sensor="ch2",series="realtime"} 3.0
-ecowitt_pm25{sensor="ch2",series="avg_24h"} 2.6
+ecowitt_pm25{sensor="ch2",series="realtime",unit="μgm3"} 3.0
+ecowitt_pm25{sensor="ch2",series="avg_24h",unit="μgm3"} 2.6
 # HELP ecowitt_aqi Air quality index
 # TYPE ecowitt_aqi gauge
 ecowitt_aqi{standard="uk"} 1.0
@@ -178,13 +181,14 @@ ecowitt_batterylevel{sensor="pm25batt2"} 5.0
 ecowitt_batterylevel{sensor="wh57batt"} 4.0
 # HELP ecowitt_batteryvoltage Battery voltage
 # TYPE ecowitt_batteryvoltage gauge
-ecowitt_batteryvoltage{sensor="soilbatt1"} 1.7
+ecowitt_batteryvoltage{sensor="soilbatt1",unit="volt"} 1.7
 # HELP ecowitt_solarradiation Solar irradiance
 # TYPE ecowitt_solarradiation gauge
 ecowitt_solarradiation{unit="wm2"} 29.22
 # HELP ecowitt_barom Barometer
 # TYPE ecowitt_barom gauge
-ecowitt_barom{sensor="relative",unit="hpa"} 1008.6
+ecowitt_barom{sensor="relative",unit="hpa"} 1024.01
+ecowitt_barom{sensor="absolute",unit="hpa"} 1008.6
 # HELP ecowitt_vpd Vapour pressure deficit
 # TYPE ecowitt_vpd gauge
 ecowitt_vpd{unit="hpa"} 5.08
