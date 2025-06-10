@@ -213,7 +213,7 @@ def logecowitt():
 
             if key == 'baromrel':
                 label = 'relative'
-            elif key == 'abs':
+            elif key == 'baromabs':
                 label = 'absolute'
             addmetric(metric='barom', label=[label, pressure_unit], value=value)
 
