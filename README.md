@@ -97,9 +97,16 @@ helm repo add djjudas21 https://djjudas21.github.io/charts/
 helm repo update djjudas21
 helm install -n monitoring ecowitt-exporter djjudas21/ecowitt-exporter
 ```
+## Grafana
 
-An accompanying [Grafana dashboard](https://github.com/djjudas21/grafana-dashboards/blob/main/Ecowitt%20Weather%20Station.json)
-is available and can be imported manually into your Grafana instance.
+An accompanying [Grafana dashboard](/grafana/EcowittWeatherStation.json)
+is available in this repo and can be imported manually into your Grafana instance.
+
+This screenshot was taken on a standard 1080p laptop. The dashboard looks a lot better on a 2.5K or 4K display.
+
+![Grafana](/grafana/EcowittWeatherStation.png)
+
+Currently all the units are hard-coded in this dashboard and I haven't found a way to make them change automatically depending on your exporter unit settings. Instead, you will have to manually change each visualisation in this dashboard to be the correct unit that you have configured in the exporter.
 
 ## How to configure your weather station
 
