@@ -14,6 +14,15 @@ This exporter runs on a single HTTP port (default `8088`) and provides two endpo
 * `/report` where the Ecowitt weather station should POST its data
 * `/metrics` where Prometheus can scrape metrics with a GET request
 
+This diagram shows the rough flow of information:
+
+![Diagram](/images/ecowitt.drawio.png)
+
+1. Ecowitt sensors submit their readings to the Ecowitt gateway via RF
+1. Ecowitt gateway aggregates the data and submits it to the Ecowitt Exporter, running as a container
+1. Prometheus periodically scrapes data from the Exporter
+1. Grafana queries metrics from Prometheus to draw graphs
+
 ## Breaking changes
 
 > [!WARNING]  
