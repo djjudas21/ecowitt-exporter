@@ -123,6 +123,35 @@ Use the WSView Plus all to configure the integration. Go into the device, scroll
 
 Then hit Save. It seems to take a couple of minutes for the weather station to submit its first reading.
 
+## Polling frequency
+
+The various Ecowitt sensors have hard-coded intervals that they submit their readings to the weather
+station or gateway over RF. These are deliberately staggered to minimise the chance of interference.
+
+| Device | Reporting interval |
+|--------|------------------------------|
+| WS69 Sensor Array | 16 seconds |
+| WS90 Haptic Sensor Array | 8.8 seconds |
+| WH41/WH43 PM2.5 Air Quality Sensor | 10 minutes |
+| WH57 Lightning Sensor | 79 seconds |
+| WN31/WH31 Temperature & Humidity Sensor | 61 seconds |
+| WN32/WH32 Temperature & Humidity Sensor | 64 seconds |
+| WN36 Floating Pool Temperature Sensor | 60 seconds |
+| WH51 Soil Moisture Meter | 70 seconds |
+
+The weather station or gateway then has a configurable upload interval (which defaults to 60 seconds)
+that they report the aggregated data to the Ecowitt Exporter.
+
+The scrape interval that Prometheus scrapes data from the Exporter should be the same as the interval
+that the gateway uploads it to the Exporter. It is currently hard-coded to 60 seconds. In a future
+release it may be configurable.
+
+There is a tradeoff here: scraping more frequently means more disk space required for Prometheus to
+store the metrics. However, we can see from the table above that if the WS69 instrument reports every
+16 seconds but the gateway only uploads every 60 seconds, we only get to see about 1 in 4 of the
+actual measurements taken. The rest are lost. This may or may not be OK, depending on how fast weather
+conditions are changing.
+
 ## Testing
 
 Real data has been captured from a Ecowitt GW1100A with this exporter in debug mode. It has been provided in `data.txt` for testing purposes.
