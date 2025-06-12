@@ -88,7 +88,7 @@ and request it. I can add the code to convert and display other units if there i
 ## Deployment
 
 This project is available as a Docker image [djjudas21/ecowitt-exporter](https://hub.docker.com/r/djjudas21/ecowitt-exporter) which can be run as a
-standalone container, but the recommended way to run it is in Kubernetes via the [Helm chart](https://github.com/djjudas21/charts/tree/main/charts/ecowitt-exporter).
+standalone container, but the recommended way to run it is in Kubernetes via the [Helm chart](https://github.com/djjudas21/charts/tree/main/charts/ecowitt-exporter) which is also available on [ArtifactHub](https://artifacthub.io/packages/helm/djjudas21/ecowitt-exporter).
 The Helm chart also supports integration with the [Prometheus Operator](https://github.com/prometheus-operator/prometheus-operator) and will
 create ServiceMonitor resources to enable automatic scraping.
 
