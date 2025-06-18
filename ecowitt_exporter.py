@@ -18,6 +18,17 @@ irradiance_unit = os.environ.get('IRRADIANCE_UNIT', 'wm2')
 aqi_standard = os.environ.get('AQI_STANDARD', 'uk')
 station_id = os.environ.get('STATION_ID', 'ecowitt')
 
+outdoor_location = os.environ.get('OUTDOOR_LOCATION')
+indoor_location = os.environ.get('INDOOR_LOCATION')
+temp1_location = os.environ.get('TEMP1_LOCATION')
+temp2_location = os.environ.get('TEMP2_LOCATION')
+temp3_location = os.environ.get('TEMP3_LOCATION')
+temp4_location = os.environ.get('TEMP4_LOCATION')
+temp5_location = os.environ.get('TEMP5_LOCATION')
+temp6_location = os.environ.get('TEMP6_LOCATION')
+temp7_location = os.environ.get('TEMP7_LOCATION')
+temp8_location = os.environ.get('TEMP8_LOCATION')
+
 print ("Ecowitt Exporter")
 print ("================")
 print ("Configuration:")
@@ -167,12 +178,15 @@ def logecowitt():
             match key:
                 case 'humidity':
                     label = 'outdoor'
+                    location = outdoor_location if outdoor_location else label
                 case 'humidityin':
                     label = 'indoor'
+                    location = indoor_location if indoor_location else label
                 case _:
                     label = f'ch{key[-1]}'
+                    location = globals()[f'temp{key[-1]}_location']
             # pylint: disable=used-before-assignment
-            addmetric(metric='humidity', label=[label, 'percent'], value=value)
+            addmetric(metric='humidity', label=[label, 'percent', location], value=value)
 
         # Solar irradiance, default W/m^2
         elif key in ['solarradiation']:
@@ -192,15 +206,18 @@ def logecowitt():
                 value = f2c(value)
             elif temperature_unit == 'k':
                 value = f2k(value)
-            
+
             if key == 'tempin':
                 label = 'indoor'
+                location = indoor_location if indoor_location else label
             elif key == 'temp':
                 label = 'outdoor'
+                location = outdoor_location if outdoor_location else label
             else:
                 label = f'ch{key[-1]}'
+                location = globals()[f'temp{key[-1]}_location']
 
-            addmetric(metric='temp', label=[label, temperature_unit], value=value)
+            addmetric(metric='temp', label=[label, temperature_unit, location], value=value)
 
         # Pressure, default inches Hg
         elif key.startswith('barom'):
@@ -284,8 +301,8 @@ if __name__ == "__main__":
     metrics['stationtype'] = Info(name='ecowitt_stationtype', documentation='Ecowitt station type')
     metrics['freq'] = Info(name='ecowitt_freq', documentation='Ecowitt radio frequency')
     metrics['model'] = Info(name='ecowitt_model', documentation='Ecowitt model')
-    metrics['temp'] = Gauge(name='ecowitt_temp', documentation='Temperature', labelnames=['sensor', 'unit'])
-    metrics['humidity'] = Gauge(name='ecowitt_humidity', documentation='Relative humidity', labelnames=['sensor', 'unit'])
+    metrics['temp'] = Gauge(name='ecowitt_temp', documentation='Temperature', labelnames=['sensor', 'unit', 'location'])
+    metrics['humidity'] = Gauge(name='ecowitt_humidity', documentation='Relative humidity', labelnames=['sensor', 'unit', 'location'])
     metrics['winddir'] = Gauge(name='ecowitt_winddir', documentation='Wind direction')
     metrics['uv'] = Gauge(name='ecowitt_uv', documentation='UV index')
     metrics['pm25'] = Gauge(name='ecowitt_pm25', documentation='PM2.5 concentration', labelnames=['series', 'sensor', 'unit'])

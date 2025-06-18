@@ -23,6 +23,10 @@ This diagram shows the rough flow of information:
 1. Prometheus periodically scrapes data from the Exporter
 1. Grafana queries metrics from Prometheus to draw graphs
 
+This exporter supports setting optional physical locations for some of the remote sensors. Setting
+the locations here causes the Prometheus metrics to be labelled, which may be helpful when writing
+queries or dashboards later.
+
 ## Breaking changes
 
 > [!WARNING]  
@@ -81,6 +85,16 @@ for whom this will be a difficult time.
 | `IRRADIANCE_UNIT`  | `wm2`   | `wm2`, `lx`, `fc`                  | Solar irradiance in Watts/m^2                                            |
 | `DISTANCE_UNIT`    | `km`    | `km`, `mi`                         | Distance from the last lightning in kilometers                           |
 | `AQI_STANDARD`     | `uk`    | `uk`, `epa`, `mep`, `nepm`         | Air Quality Index standard in UK DAQI, US EPA, China MEP, Australia NEPM |
+| `OUTDOOR_LOCATION` |         |                                    | Physical location of outdoor Ecowitt sensor array                        |
+| `INDOOR_LOCATION`  |         |                                    | Physical location of indoor Ecowitt gateway                              |
+| `TEMP1_LOCATION`   |         |                                    | Physical location of Ecowitt channel 1 temperature sensor                |
+| `TEMP2_LOCATION`   |         |                                    | Physical location of Ecowitt channel 2 temperature sensor                |
+| `TEMP3_LOCATION`   |         |                                    | Physical location of Ecowitt channel 3 temperature sensor                |
+| `TEMP4_LOCATION`   |         |                                    | Physical location of Ecowitt channel 4 temperature sensor                |
+| `TEMP5_LOCATION`   |         |                                    | Physical location of Ecowitt channel 5 temperature sensor                |
+| `TEMP6_LOCATION`   |         |                                    | Physical location of Ecowitt channel 6 temperature sensor                |
+| `TEMP7_LOCATION`   |         |                                    | Physical location of Ecowitt channel 7 temperature sensor                |
+| `TEMP8_LOCATION`   |         |                                    | Physical location of Ecowitt channel 8 temperature sensor                |
 
 If you want to use one of the units that is not yet supported, please [open an issue](https://github.com/djjudas21/ecowitt-exporter/issues)
 and request it. I can add the code to convert and display other units if there is demand.
@@ -154,7 +168,20 @@ conditions are changing.
 
 ## Testing
 
-Real data has been captured from a Ecowitt GW1100A with this exporter in debug mode. It has been provided in `data.txt` for testing purposes.
+The exporter script can be run locally simply with:
+
+```
+python ecowitt_exporter.py
+```
+
+You can set environment variables, e.g. the physical location fields for testing:
+
+```
+TEMP1_LOCATION=Garden python ecowitt_exporter.py
+```
+
+Real data has been captured from a Ecowitt GW1100A with this exporter in debug mode. It has been
+provided in `data.txt` for testing purposes.
 
 A POST request from an Ecowitt device can be simulated with curl:
 
@@ -177,26 +204,26 @@ ecowitt_freq_info{freq="868M"} 1.0
 ecowitt_model_info{model="GW1100A"} 1.0
 # HELP ecowitt_temp Temperature
 # TYPE ecowitt_temp gauge
-ecowitt_temp{sensor="indoor",unit="c"} 30.1
-ecowitt_temp{sensor="outdoor",unit="c"} 17.7
-ecowitt_temp{sensor="ch1",unit="c"} 23.5
-ecowitt_temp{sensor="ch2",unit="c"} 21.7
-ecowitt_temp{sensor="ch3",unit="c"} 24.4
-ecowitt_temp{sensor="ch4",unit="c"} 22.8
-ecowitt_temp{sensor="ch5",unit="c"} 24.3
-ecowitt_temp{sensor="ch6",unit="c"} 25.4
-ecowitt_temp{sensor="ch8",unit="c"} 23.3
+ecowitt_temp{location="indoor",sensor="indoor",unit="c"} 30.1
+ecowitt_temp{location="outdoor",sensor="outdoor",unit="c"} 17.7
+ecowitt_temp{location="Garden",sensor="ch1",unit="c"} 23.5
+ecowitt_temp{location="None",sensor="ch2",unit="c"} 21.7
+ecowitt_temp{location="None",sensor="ch3",unit="c"} 24.4
+ecowitt_temp{location="None",sensor="ch4",unit="c"} 22.8
+ecowitt_temp{location="None",sensor="ch5",unit="c"} 24.3
+ecowitt_temp{location="None",sensor="ch6",unit="c"} 25.4
+ecowitt_temp{location="None",sensor="ch8",unit="c"} 23.3
 # HELP ecowitt_humidity Relative humidity
 # TYPE ecowitt_humidity gauge
-ecowitt_humidity{sensor="indoor",unit="percent"} 41.0
-ecowitt_humidity{sensor="outdoor",unit="percent"} 75.0
-ecowitt_humidity{sensor="ch1",unit="percent"} 57.0
-ecowitt_humidity{sensor="ch2",unit="percent"} 61.0
-ecowitt_humidity{sensor="ch3",unit="percent"} 54.0
-ecowitt_humidity{sensor="ch4",unit="percent"} 62.0
-ecowitt_humidity{sensor="ch5",unit="percent"} 54.0
-ecowitt_humidity{sensor="ch6",unit="percent"} 45.0
-ecowitt_humidity{sensor="ch8",unit="percent"} 58.0
+ecowitt_humidity{location="indoor",sensor="indoor",unit="percent"} 41.0
+ecowitt_humidity{location="outdoor",sensor="outdoor",unit="percent"} 75.0
+ecowitt_humidity{location="Garden",sensor="ch1",unit="percent"} 57.0
+ecowitt_humidity{location="None",sensor="ch2",unit="percent"} 61.0
+ecowitt_humidity{location="None",sensor="ch3",unit="percent"} 54.0
+ecowitt_humidity{location="None",sensor="ch4",unit="percent"} 62.0
+ecowitt_humidity{location="None",sensor="ch5",unit="percent"} 54.0
+ecowitt_humidity{location="None",sensor="ch6",unit="percent"} 45.0
+ecowitt_humidity{location="None",sensor="ch8",unit="percent"} 58.0
 # HELP ecowitt_winddir Wind direction
 # TYPE ecowitt_winddir gauge
 ecowitt_winddir 173.0
