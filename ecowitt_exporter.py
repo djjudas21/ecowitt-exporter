@@ -126,7 +126,7 @@ def logecowitt():
             else:
                 addmetric(metric='batterystatus', label=[key], value=value)
 
-        # Soil moisure
+        # Soil moisture
         elif key.startswith('soilmoisture'):
             addmetric(metric='soilmoisture', label=[key, 'percent'], value=value)
 
