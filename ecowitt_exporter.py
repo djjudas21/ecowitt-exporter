@@ -1,6 +1,7 @@
 import os
 import logging
 import re
+import time
 from flask import Flask, request
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from prometheus_client import make_wsgi_app, Gauge, Info
@@ -133,6 +134,11 @@ def logecowitt():
             # Battery voltage - returns a decimal voltage e.g. 1.7
             elif key.startswith('soil') or key.startswith('ws90'):
                 addmetric(metric='batteryvoltage', label=[key, 'volt'], value=value)
+                # Per-sensor last-seen timestamp (see note on sensor freshness
+                # tracking at bottom of /report handler).
+                if key.startswith('soilbatt'):
+                    addmetric(metric='sensor_last_report_timestamp',
+                              label=[key], value=time.time())
             # Battery status - returns 0 for OK and 1 for low
             else:
                 addmetric(metric='batterystatus', label=[key], value=value)
@@ -140,6 +146,10 @@ def logecowitt():
         # Soil moisture
         elif key.startswith('soilmoisture'):
             addmetric(metric='soilmoisture', label=[key, 'percent'], value=value)
+            # Per-sensor last-seen timestamp (see note on sensor freshness
+            # tracking at bottom of /report handler).
+            addmetric(metric='sensor_last_report_timestamp',
+                      label=[key], value=time.time())
 
         # PM25
         # 'pm25_ch1', 'pm25_avg_24h_ch1'
@@ -287,6 +297,17 @@ def logecowitt():
                 addmetric(metric='lightning', label=[distance_unit], value=value)
 
 
+    # Record the wall-clock time of this successful push from the gateway.
+    # Prometheus can then use `time() - ecowitt_last_report_timestamp_seconds`
+    # to detect a stale gateway (gauges persist their last value forever,
+    # so absent_over_time() on data metrics never fires if the gateway dies).
+    #
+    # Per-sensor timestamps are updated inline above as each sensor's key is
+    # processed, so individual sensor staleness can also be detected even when
+    # the gateway is otherwise healthy (e.g. a single soil probe goes offline
+    # or out of radio range).
+    metrics['last_report_timestamp'].set(time.time())
+
     # Return a 200 to the weather station
     response = app.response_class(
             response='OK',
@@ -321,6 +342,25 @@ if __name__ == "__main__":
     metrics['lightning_time'] = Gauge(name='ecowitt_lightning_time', documentation='Lightning last strike')
     metrics['ws90'] = Gauge(name='ecowitt_wh90', documentation='WS90 electrical energy stored', labelnames=['sensor', 'unit'])
     metrics['soilmoisture'] = Gauge(name='ecowitt_soilmoisture', documentation='Soil moisture', labelnames=['sensor', 'unit'])
+    metrics['last_report_timestamp'] = Gauge(
+        name='ecowitt_last_report_timestamp_seconds',
+        documentation='Unix timestamp of the most recent successful POST from the Ecowitt gateway to /report. Use `time() - ecowitt_last_report_timestamp_seconds > N` to detect a stale or offline gateway.'
+    )
+    # Seed with current time so the freshness alert does not fire immediately
+    # after an exporter restart (it gets a grace period equal to the alert
+    # `for:` duration before a real gateway push updates the value).
+    metrics['last_report_timestamp'].set(time.time())
+
+    # Per-sensor last-seen timestamp. Updated whenever a specific sensor's
+    # data appears in a push, so individual sensors can be monitored for
+    # staleness even if the gateway itself is healthy. Used for soilmoisture*
+    # and soilbatt* in particular (plants going unwatered because a single
+    # probe lost radio sync is a real failure mode we want to alert on).
+    metrics['sensor_last_report_timestamp'] = Gauge(
+        name='ecowitt_sensor_last_report_timestamp_seconds',
+        documentation='Unix timestamp of the most recent report from a specific sensor. Use `time() - ecowitt_sensor_last_report_timestamp_seconds{sensor="soilmoisture1"} > N` to detect a stale individual sensor.',
+        labelnames=['sensor']
+    )
 
     # Increase Flask logging if in debug mode
     if debug:
