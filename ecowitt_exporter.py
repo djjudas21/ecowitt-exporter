@@ -131,6 +131,13 @@ def logecowitt():
             # Battery level - returns battery level from 0-5
             if key in ['wh57batt', 'pm25batt1', 'pm25batt2']:
                 addmetric(metric='batterylevel', label=[key], value=value)
+                # Per-sensor last-seen timestamp for PM2.5 sensors (see note
+                # on sensor freshness tracking at bottom of /report handler).
+                # The WH41 PM2.5 sensor can drop off the radio and we want to
+                # alert on that independently of the gateway.
+                if key.startswith('pm25batt'):
+                    addmetric(metric='sensor_last_report_timestamp',
+                              label=[key], value=time.time())
             # Battery voltage - returns a decimal voltage e.g. 1.7
             elif key.startswith('soil') or key.startswith('ws90'):
                 addmetric(metric='batteryvoltage', label=[key, 'volt'], value=value)
@@ -161,6 +168,10 @@ def logecowitt():
                 app.logger.debug(f"Drop erroneous PM25 reading {key}: {value}")
                 continue
 
+            # Preserve the original key (e.g. 'pm25_ch1') so we can use it as
+            # a per-sensor last-seen label below.
+            original_key = key
+
             # Drop PM25 prefix
             key = key.replace('pm25_', '')
 
@@ -177,6 +188,14 @@ def logecowitt():
 
             # Log the PM25 metric
             addmetric(metric='pm25', label=[series, sensor, 'μgm3'], value=value)
+
+            # Per-sensor last-seen timestamp for PM2.5 sensors (see note on
+            # sensor freshness tracking at bottom of /report handler). Only
+            # update on the realtime series; avg_24h is a derived rollup and
+            # doesn't represent a fresh sensor push.
+            if series == 'realtime':
+                addmetric(metric='sensor_last_report_timestamp',
+                          label=[original_key], value=time.time())
 
             # Calculate AQI from PM25
             if key.startswith('avg_24h'):
@@ -353,9 +372,10 @@ if __name__ == "__main__":
 
     # Per-sensor last-seen timestamp. Updated whenever a specific sensor's
     # data appears in a push, so individual sensors can be monitored for
-    # staleness even if the gateway itself is healthy. Used for soilmoisture*
-    # and soilbatt* in particular (plants going unwatered because a single
-    # probe lost radio sync is a real failure mode we want to alert on).
+    # staleness even if the gateway itself is healthy. Used for soilmoisture*,
+    # soilbatt*, pm25_ch* and pm25batt* in particular - both soil probes
+    # losing radio sync (plants going unwatered) and WH41 PM2.5 sensors going
+    # offline are real failure modes we want to alert on.
     metrics['sensor_last_report_timestamp'] = Gauge(
         name='ecowitt_sensor_last_report_timestamp_seconds',
         documentation='Unix timestamp of the most recent report from a specific sensor. Use `time() - ecowitt_sensor_last_report_timestamp_seconds{sensor="soilmoisture1"} > N` to detect a stale individual sensor.',
