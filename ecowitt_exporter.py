@@ -19,6 +19,18 @@ irradiance_unit = os.environ.get('IRRADIANCE_UNIT', 'wm2')
 aqi_standard = os.environ.get('AQI_STANDARD', 'uk')
 station_id = os.environ.get('STATION_ID', 'ecowitt')
 
+# Comma-separated list of sensor names to pre-seed in
+# ecowitt_sensor_last_report_timestamp_seconds at startup. Without this, the
+# per-sensor freshness metric is only created when a sensor first pushes data,
+# which means staleness alerts of the form
+# `time() - ecowitt_sensor_last_report_timestamp_seconds{sensor="soilmoisture1"} > N`
+# return no data (and therefore never fire) if the exporter restarts while
+# the sensor is already offline. Seeding with the current time gives the alert
+# a grace period equal to its `for:` duration.
+sensors_to_track = [
+    s.strip() for s in os.environ.get('SENSORS_TO_TRACK', '').split(',') if s.strip()
+]
+
 outdoor_location = os.environ.get('OUTDOOR_LOCATION')
 indoor_location = os.environ.get('INDOOR_LOCATION')
 temp1_location = os.environ.get('TEMP1_LOCATION')
@@ -42,6 +54,7 @@ print ('  DISTANCE_UNIT:    ' + distance_unit)
 print ('  IRRADIANCE_UNIT:  ' + irradiance_unit)
 print ('  AQI STANDARD:     ' + aqi_standard)
 print ('  STATION_ID:       ' + station_id)
+print ('  SENSORS_TO_TRACK: ' + (','.join(sensors_to_track) if sensors_to_track else '(none)'))
 
 # Declare metrics as a global
 metrics={}
@@ -381,6 +394,18 @@ if __name__ == "__main__":
         documentation='Unix timestamp of the most recent report from a specific sensor. Use `time() - ecowitt_sensor_last_report_timestamp_seconds{sensor="soilmoisture1"} > N` to detect a stale individual sensor.',
         labelnames=['sensor']
     )
+
+    # Pre-seed per-sensor freshness timestamps for every sensor named in
+    # SENSORS_TO_TRACK. This ensures the metric exists for each expected
+    # sensor immediately at exporter startup, so staleness alerts like
+    # `time() - ecowitt_sensor_last_report_timestamp_seconds{sensor="soilmoisture1"} > 600`
+    # return a value (and can fire) even if the exporter restarted while the
+    # sensor was offline. Without seeding, the metric wouldn't exist until
+    # the sensor's first push, so `time() - <missing>` returns no data and
+    # the alert silently never fires. Seeding with `time.time()` gives a
+    # grace period equal to the alert's `for:` duration before it trips.
+    for sensor_name in sensors_to_track:
+        metrics['sensor_last_report_timestamp'].labels(sensor=sensor_name).set(time.time())
 
     # Increase Flask logging if in debug mode
     if debug:

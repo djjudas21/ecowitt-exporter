@@ -95,6 +95,40 @@ for whom this will be a difficult time.
 | `TEMP6_LOCATION`   |         |                                    | Physical location of Ecowitt channel 6 temperature sensor                |
 | `TEMP7_LOCATION`   |         |                                    | Physical location of Ecowitt channel 7 temperature sensor                |
 | `TEMP8_LOCATION`   |         |                                    | Physical location of Ecowitt channel 8 temperature sensor                |
+| `SENSORS_TO_TRACK` |         | comma-separated list               | Sensor names to pre-seed for staleness alerts (see below)                |
+
+### `SENSORS_TO_TRACK` and per-sensor staleness alerts
+
+The exporter exposes `ecowitt_sensor_last_report_timestamp_seconds{sensor="..."}`
+so that Prometheus alerts can detect individual sensors going stale, e.g.
+a WH51 soil probe losing radio sync or a WH41 PM2.5 sensor going offline:
+
+```promql
+time() - ecowitt_sensor_last_report_timestamp_seconds{sensor="soilmoisture1"} > 600
+```
+
+By default the per-sensor metric is only created the first time a given
+sensor pushes data. This creates a subtle problem: if the exporter restarts
+while a sensor is already offline, the metric never gets created, so
+`time() - <missing metric>` returns no data and the alert silently never
+fires — exactly the condition you want to alert on.
+
+Setting `SENSORS_TO_TRACK` to a comma-separated list of expected sensor
+names causes the exporter to pre-seed
+`ecowitt_sensor_last_report_timestamp_seconds` with the current time for
+each listed sensor at startup. The alert then has a grace period equal to
+its `for:` duration before it trips, and will correctly fire if the sensor
+never pushes. If the variable is unset or empty, the exporter preserves
+the old lazy-creation behaviour.
+
+Example:
+
+```
+SENSORS_TO_TRACK=soilmoisture1,soilmoisture2,soilmoisture3,soilbatt1,soilbatt2,soilbatt3,pm25_ch1,pm25batt1
+```
+
+Use the same sensor names that appear as the `sensor` label on
+`ecowitt_sensor_last_report_timestamp_seconds` once data starts flowing.
 
 If you want to use one of the units that is not yet supported, please [open an issue](https://github.com/djjudas21/ecowitt-exporter/issues)
 and request it. I can add the code to convert and display other units if there is demand.
