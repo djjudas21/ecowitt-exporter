@@ -31,6 +31,7 @@ sensors_to_track = [
     s.strip() for s in os.environ.get('SENSORS_TO_TRACK', '').split(',') if s.strip()
 ]
 
+co2_location = os.environ.get('CO2_LOCATION')
 outdoor_location = os.environ.get('OUTDOOR_LOCATION')
 indoor_location = os.environ.get('INDOOR_LOCATION')
 temp1_location = os.environ.get('TEMP1_LOCATION')
@@ -171,7 +172,44 @@ def logecowitt():
             addmetric(metric='sensor_last_report_timestamp',
                       label=[key], value=time.time())
 
-        # PM25
+        # WH45 CO2/AQI multi-sensor (tf_co2, humi_co2, pm25_co2,
+        # pm25_24h_co2, pm10_co2, pm10_24h_co2, co2, co2_24h)
+        # Must be checked BEFORE the generic pm25 handler.
+        elif key == 'tf_co2':
+            if temperature_unit == 'c':
+                value = f2c(value)
+            elif temperature_unit == 'k':
+                value = f2k(value)
+            location = co2_location if co2_location else 'co2'
+            addmetric(metric='temp', label=['co2', temperature_unit, location], value=value)
+            addmetric(metric='sensor_last_report_timestamp',
+                      label=['co2'], value=time.time())
+
+        elif key == 'humi_co2':
+            location = co2_location if co2_location else 'co2'
+            addmetric(metric='humidity', label=['co2', 'percent', location], value=value)
+
+        elif key == 'pm25_co2':
+            addmetric(metric='pm25', label=['realtime', 'co2', 'μgm3'], value=value)
+
+        elif key == 'pm25_24h_co2':
+            addmetric(metric='pm25', label=['avg_24h', 'co2', 'μgm3'], value=value)
+            aqi = calculate_aqi(standard=aqi_standard, value=value)
+            addmetric(metric='aqi', label=[aqi_standard, 'co2'], value=aqi)
+
+        elif key == 'pm10_co2':
+            addmetric(metric='pm10', label=['realtime', 'co2', 'μgm3'], value=value)
+
+        elif key == 'pm10_24h_co2':
+            addmetric(metric='pm10', label=['avg_24h', 'co2', 'μgm3'], value=value)
+
+        elif key == 'co2':
+            addmetric(metric='co2', label=['realtime', 'ppm'], value=value)
+
+        elif key == 'co2_24h':
+            addmetric(metric='co2', label=['avg_24h', 'ppm'], value=value)
+
+        # PM25 (WH41 channel sensors)
         # 'pm25_ch1', 'pm25_avg_24h_ch1'
         elif key.startswith('pm25'):
             # Check for invalid readings from the WH41 PM2.5 sensor when the battery is low
@@ -213,7 +251,7 @@ def logecowitt():
             # Calculate AQI from PM25
             if key.startswith('avg_24h'):
                 aqi = calculate_aqi(standard=aqi_standard, value=value)
-                addmetric(metric='aqi', label=[aqi_standard], value=aqi)
+                addmetric(metric='aqi', label=[aqi_standard, sensor], value=aqi)
 
         # Humidity - no conversion needed
         elif key.startswith('humidity'):
@@ -359,7 +397,9 @@ if __name__ == "__main__":
     metrics['winddir'] = Gauge(name='ecowitt_winddir', documentation='Wind direction')
     metrics['uv'] = Gauge(name='ecowitt_uv', documentation='UV index')
     metrics['pm25'] = Gauge(name='ecowitt_pm25', documentation='PM2.5 concentration', labelnames=['series', 'sensor', 'unit'])
-    metrics['aqi'] = Gauge(name='ecowitt_aqi', documentation='Air quality index', labelnames=['standard'])
+    metrics['aqi'] = Gauge(name='ecowitt_aqi', documentation='Air quality index', labelnames=['standard', 'sensor'])
+    metrics['pm10'] = Gauge(name='ecowitt_pm10', documentation='PM10 concentration', labelnames=['series', 'sensor', 'unit'])
+    metrics['co2'] = Gauge(name='ecowitt_co2', documentation='CO2 concentration', labelnames=['series', 'unit'])
     metrics['batterystatus'] = Gauge(name='ecowitt_batterystatus', documentation='Battery status', labelnames=['sensor'])
     metrics['batterylevel'] = Gauge(name='ecowitt_batterylevel', documentation='Battery level', labelnames=['sensor'])
     metrics['batteryvoltage'] = Gauge(name='ecowitt_batteryvoltage', documentation='Battery voltage', labelnames=['sensor', 'unit'])
