@@ -173,7 +173,12 @@ def logecowitt():
                       label=[key], value=time.time())
 
         # WH45 CO2/AQI multi-sensor (tf_co2, humi_co2, pm25_co2,
-        # pm25_24h_co2, pm10_co2, pm10_24h_co2, co2, co2_24h)
+        # pm25_24h_co2, pm10_co2, pm10_24h_co2, co2, co2_24h).
+        # WH46D extends this with pm1_co2, pm1_24h_co2, pm4_co2, pm4_24h_co2
+        # on the same _co2 suffix convention. Both sensors share the
+        # `sensor="co2"` label on all PM/CO2/temp/humidity metrics, so
+        # dashboards and alerts that target the WH45 continue to work
+        # unchanged when the gateway is upgraded to a WH46D.
         # Must be checked BEFORE the generic pm25 handler.
         elif key == 'tf_co2':
             if temperature_unit == 'c':
@@ -189,6 +194,13 @@ def logecowitt():
             location = co2_location if co2_location else 'co2'
             addmetric(metric='humidity', label=['co2', 'percent', location], value=value)
 
+        # WH46D: PM1.0 (not reported by WH45).
+        elif key == 'pm1_co2':
+            addmetric(metric='pm1', label=['realtime', 'co2', 'μgm3'], value=value)
+
+        elif key == 'pm1_24h_co2':
+            addmetric(metric='pm1', label=['avg_24h', 'co2', 'μgm3'], value=value)
+
         elif key == 'pm25_co2':
             addmetric(metric='pm25', label=['realtime', 'co2', 'μgm3'], value=value)
 
@@ -196,6 +208,13 @@ def logecowitt():
             addmetric(metric='pm25', label=['avg_24h', 'co2', 'μgm3'], value=value)
             aqi = calculate_aqi(standard=aqi_standard, value=value)
             addmetric(metric='aqi', label=[aqi_standard, 'co2'], value=aqi)
+
+        # WH46D: PM4.0 (not reported by WH45).
+        elif key == 'pm4_co2':
+            addmetric(metric='pm4', label=['realtime', 'co2', 'μgm3'], value=value)
+
+        elif key == 'pm4_24h_co2':
+            addmetric(metric='pm4', label=['avg_24h', 'co2', 'μgm3'], value=value)
 
         elif key == 'pm10_co2':
             addmetric(metric='pm10', label=['realtime', 'co2', 'μgm3'], value=value)
@@ -396,7 +415,9 @@ if __name__ == "__main__":
     metrics['humidity'] = Gauge(name='ecowitt_humidity', documentation='Relative humidity', labelnames=['sensor', 'unit', 'location'])
     metrics['winddir'] = Gauge(name='ecowitt_winddir', documentation='Wind direction')
     metrics['uv'] = Gauge(name='ecowitt_uv', documentation='UV index')
+    metrics['pm1'] = Gauge(name='ecowitt_pm1', documentation='PM1.0 concentration (WH46D)', labelnames=['series', 'sensor', 'unit'])
     metrics['pm25'] = Gauge(name='ecowitt_pm25', documentation='PM2.5 concentration', labelnames=['series', 'sensor', 'unit'])
+    metrics['pm4'] = Gauge(name='ecowitt_pm4', documentation='PM4.0 concentration (WH46D)', labelnames=['series', 'sensor', 'unit'])
     metrics['aqi'] = Gauge(name='ecowitt_aqi', documentation='Air quality index', labelnames=['standard', 'sensor'])
     metrics['pm10'] = Gauge(name='ecowitt_pm10', documentation='PM10 concentration', labelnames=['series', 'sensor', 'unit'])
     metrics['co2'] = Gauge(name='ecowitt_co2', documentation='CO2 concentration', labelnames=['series', 'unit'])
