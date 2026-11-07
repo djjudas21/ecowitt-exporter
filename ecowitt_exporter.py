@@ -79,7 +79,8 @@ rainmaps = {
         "drain_piezo": "dailyrain",
         "wrain_piezo": "weeklyrain",
         "mrain_piezo": "monthlyrain",
-        "yrain_piezo": "yearlyrain"
+        "yrain_piezo": "yearlyrain",
+        "last24hrain_piezo": "last24hrain"
 }
 
 # pylint: disable=dangerous-default-value
@@ -342,7 +343,12 @@ def logecowitt():
                 key = key[:-3]
             addmetric(metric='wind', label=[key, wind_unit], value=value)
         
-        # Support for WS90 with a haptic rain sensor
+        # Support for WS90 with a haptic rain sensor (rain state)
+        elif key == 'srain_piezo':
+            # Rain state: 0 = no rain, 1 = rain
+            addmetric(metric='rain_state', label=[key], value=value)
+
+        # Support for WS90 with a haptic rain sensor (cumulative rain amounts)
         elif key.endswith('piezo'):
             if rain_unit == 'mm':
                 value = in2mm(value)
@@ -409,6 +415,7 @@ if __name__ == "__main__":
     metrics['wind'] = Gauge(name='ecowitt_windspeed', documentation='Wind speed', labelnames=['sensor', 'unit'])
     metrics['wind_beaufort'] = Gauge(name='ecowitt_windspeed_beaufort', documentation='Wind Beaufort scale')
     metrics['rain'] = Gauge(name='ecowitt_rain', documentation='Rainfall', labelnames=['sensor', 'unit'])
+    metrics['rain_state'] = Gauge(name='ecowitt_rain_state', documentation='Rain state (0=no rain, 1=rain)', labelnames=['sensor'])
     metrics['lightning'] = Gauge(name='ecowitt_lightning', documentation='Lightning distance', labelnames=['unit'])
     metrics['lightning_num'] = Gauge(name='ecowitt_lightning_num', documentation='Lightning daily count')
     metrics['lightning_time'] = Gauge(name='ecowitt_lightning_time', documentation='Lightning last strike')
