@@ -154,7 +154,7 @@ def logecowitt():
                     addmetric(metric='sensor_last_report_timestamp',
                               label=[key], value=time.time())
             # Battery voltage - returns a decimal voltage e.g. 1.7
-            elif key.startswith('soil') or key.startswith('ws90'):
+            elif key.startswith(('soil', 'ws90', 'wh90')):
                 addmetric(metric='batteryvoltage', label=[key, 'volt'], value=value)
                 # Per-sensor last-seen timestamp (see note on sensor freshness
                 # tracking at bottom of /report handler).
