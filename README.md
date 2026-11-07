@@ -55,6 +55,7 @@ that does or doesn't work, please raise an issue so I can update the list.
 - WN32/WH32 Single-Channel Temperature & Humidity Sensor
 - WN36 Floating Pool Temperature Sensor
 - WH51 Soil Moisture Meter
+- WH52 Soil Moisture, Temperature & EC Sensor
 
 ## Note about Ecowitt firmware
 
@@ -330,6 +331,13 @@ ecowitt_lightning_time 1.747849832e+09
 # HELP ecowitt_soilmoisture Soil moisture
 # TYPE ecowitt_soilmoisture gauge
 ecowitt_soilmoisture{sensor="soilmoisture1",unit="percent"} 0.0
+ecowitt_soilmoisture{sensor="soil_ec_hum1",unit="percent"} 31.0
+# HELP ecowitt_soiltemp Soil temperature
+# TYPE ecowitt_soiltemp gauge
+ecowitt_soiltemp{sensor="soil_ec_temp1",unit="c"} 18.7
+# HELP ecowitt_soilec Soil electrical conductivity
+# TYPE ecowitt_soilec gauge
+ecowitt_soilec{sensor="soil_ec1",unit="uscm"} 320.0
 ```
 
 ## Building and running locally

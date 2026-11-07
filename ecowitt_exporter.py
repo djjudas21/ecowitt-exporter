@@ -158,12 +158,33 @@ def logecowitt():
                 addmetric(metric='batteryvoltage', label=[key, 'volt'], value=value)
                 # Per-sensor last-seen timestamp (see note on sensor freshness
                 # tracking at bottom of /report handler).
-                if key.startswith('soilbatt'):
+                if key.startswith(('soilbatt', 'soil_ec_batt')):
                     addmetric(metric='sensor_last_report_timestamp',
                               label=[key], value=time.time())
             # Battery status - returns 0 for OK and 1 for low
             else:
                 addmetric(metric='batterystatus', label=[key], value=value)
+
+        # WH52 soil sensor - moisture, default percent
+        # The raw AD readings (soil_ec_hum_ad1, soil_ec_ad1) are ignored, as soilad1 is
+        elif re.fullmatch(r'soil_ec_hum\d+', key):
+            addmetric(metric='soilmoisture', label=[key, 'percent'], value=value)
+            # Per-sensor last-seen timestamp (see note on sensor freshness
+            # tracking at bottom of /report handler).
+            addmetric(metric='sensor_last_report_timestamp',
+                      label=[key], value=time.time())
+
+        # WH52 soil sensor - temperature, default Fahrenheit
+        elif re.fullmatch(r'soil_ec_temp\d+', key):
+            if temperature_unit == 'c':
+                value = f2c(value)
+            elif temperature_unit == 'k':
+                value = f2k(value)
+            addmetric(metric='soiltemp', label=[key, temperature_unit], value=value)
+
+        # WH52 soil sensor - electrical conductivity, default uS/cm
+        elif re.fullmatch(r'soil_ec\d+', key):
+            addmetric(metric='soilec', label=[key, 'uscm'], value=value)
 
         # Soil moisture
         elif key.startswith('soilmoisture'):
@@ -421,6 +442,8 @@ if __name__ == "__main__":
     metrics['lightning_time'] = Gauge(name='ecowitt_lightning_time', documentation='Lightning last strike')
     metrics['ws90'] = Gauge(name='ecowitt_wh90', documentation='WS90 electrical energy stored', labelnames=['sensor', 'unit'])
     metrics['soilmoisture'] = Gauge(name='ecowitt_soilmoisture', documentation='Soil moisture', labelnames=['sensor', 'unit'])
+    metrics['soiltemp'] = Gauge(name='ecowitt_soiltemp', documentation='Soil temperature', labelnames=['sensor', 'unit'])
+    metrics['soilec'] = Gauge(name='ecowitt_soilec', documentation='Soil electrical conductivity', labelnames=['sensor', 'unit'])
     metrics['last_report_timestamp'] = Gauge(
         name='ecowitt_last_report_timestamp_seconds',
         documentation='Unix timestamp of the most recent successful POST from the Ecowitt gateway to /report. Use `time() - ecowitt_last_report_timestamp_seconds > N` to detect a stale or offline gateway.'
@@ -433,7 +456,7 @@ if __name__ == "__main__":
     # Per-sensor last-seen timestamp. Updated whenever a specific sensor's
     # data appears in a push, so individual sensors can be monitored for
     # staleness even if the gateway itself is healthy. Used for soilmoisture*,
-    # soilbatt*, pm25_ch* and pm25batt* in particular - both soil probes
+    # soilbatt*, soil_ec_hum*, soil_ec_batt*, pm25_ch* and pm25batt* in particular - both soil probes
     # losing radio sync (plants going unwatered) and WH41 PM2.5 sensors going
     # offline are real failure modes we want to alert on.
     metrics['sensor_last_report_timestamp'] = Gauge(
