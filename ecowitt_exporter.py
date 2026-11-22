@@ -71,18 +71,6 @@ def log_request_info():
     app.logger.debug('Body: %s', request.get_data())
 
 
-# Support for WS90 with a haptic rain sensor
-rainmaps = {
-        "rrain_piezo": "rainrate",
-        "erain_piezo": "eventrain",
-        "hrain_piezo": "hourlyrain",
-        "drain_piezo": "dailyrain",
-        "wrain_piezo": "weeklyrain",
-        "mrain_piezo": "monthlyrain",
-        "yrain_piezo": "yearlyrain",
-        "last24hrain_piezo": "last24hrain"
-}
-
 # pylint: disable=dangerous-default-value
 def addmetric(metric: str, value: str, label: list = []):
     '''
@@ -373,7 +361,6 @@ def logecowitt():
         elif key.endswith('piezo'):
             if rain_unit == 'mm':
                 value = in2mm(value)
-            mkey = rainmaps[key]
             addmetric(metric='rain', label=[key, rain_unit], value=value)
 
         # Rainfall, default inches
